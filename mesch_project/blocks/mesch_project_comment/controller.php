@@ -72,6 +72,42 @@ class MeschProjectCommentBlockController extends BlockController {
 		$this->set('text', $this->text);
 	
 	}
+   
+   protected function sendMailNotification($comment) {
+      $blocks = $this->getCollectionObject()->getBlocks();
+      
+      $u = new User();
+      $uID = $u->getUserID();
+      
+      $recipients = array();
+      
+      foreach ($blocks as $block) {
+         if ($block->getBlockTypeHandle() == 'mesch_project_comment') {
+            $blockInstance = $block->getInstance();
+            
+            // ignore current user
+            if ($uID == $blockInstance->uID) continue;
+
+            $recipients[$blockInstance->uID] = $blockInstance->uID;
+         }
+      }
+      
+      $nh = Loader::helper('navigation');
+      
+      foreach ($recipients as $recipientID) {
+         $ui = UserInfo::getByID($recipientID);
+
+         $mh = Loader::helper('mail');
+         $mh->addParameter('subject', $this->getCollectionObject()->getCollectionName());
+         $mh->addParameter('text', $data['text']);
+         $mh->addParameter('recipient', $ui->getUserName());
+         $mh->addParameter('team', SITE);
+         $mh->addParameter('link', $nh->getLinkToCollection($this->getCollectionObject(), true));
+         $mh->load('message_notification', 'mesch_project');
+         $mh->to($ui->getUserEmail());
+         $mh->sendMail();   
+      }
+   }
 	
 	public function save($args) {      
       $db = Loader::db();
@@ -82,6 +118,8 @@ class MeschProjectCommentBlockController extends BlockController {
       
       $this->getCollectionObject()->setAttribute('mesch_project_update', $args['createdOn']);
 		
+      $this->sendMailNotification($args['text']);
+      
 		parent::save($data);
 	}
 }
