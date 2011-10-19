@@ -1,0 +1,107 @@
+/*
+////////////////////////////////////////////////////////////////
+//
+// Stylesheet für die Inhaltsseiten
+//
+// mesch.ch web consulting & design GmbH
+// www.mesch.ch
+//
+////////////////////////////////////////////////////////////////
+*/
+
+html, body, div, pre, form, fieldset, input, h1, h2, h3, h4, h5, h6, p, textarea, ul, ol, li, dl, dt, dd, blockquote, th, td {
+   margin: 0;
+   padding: 0;   
+}
+html, body {
+   height: 100%;
+}
+body  {
+}
+#wrapper {
+   background: url(images/background.png) repeat-x;
+   margin: 0 auto;
+   width: 100%;
+}
+#left-sidebar {
+   float: left; 
+   width: 250px; 
+}
+#navigation {
+   clear: both;
+   height: 50px;
+}
+#content {
+   padding: 10px;
+   font-family: Arial,sans-serif;
+   
+}
+#navigation a {
+   float: left;
+   display: inline;
+   color: #36C;
+   font-family: Arial,sans-serif;
+   text-decoration: none;
+   display: block;
+   padding: 13px 10px 0px 10px;
+   border-top: 3px solid transparent;
+}
+#navigation a:hover {
+   border-top: 3px solid #1A54E2;
+   color: black;
+}
+#main {
+   float: left;
+   width: 600px;
+}
+#right-sidebar {
+   float: left;
+   width: 250px;
+}
+#footer {
+   text-align: right;
+}
+
+/* styles for issue page type */
+.mesch-project-issue, .mesch-project-issue-comment {
+   background-color: #FFFFF2;
+   border: 1px solid #D8D8D8;
+   padding: 5px;
+   margin: 5px 0px 15px 0px;
+}
+.mesch-project-issue-comment ul {
+   margin: 10px 10px 10px 20px;
+}
+
+/* styles for project page type */
+.mesch-project-list {
+   width: 100%;
+   border: 1px solid #D8D8D8;
+}
+.mesch-project-list thead tr:first-child {
+   background: #EEEEDD;
+}
+.mesch-project-list tbody tr:nth-child(even) {
+   background: #EEEEEE;
+}
+.mesch-project-list tbody tr:nth-child(odd) {
+   background: #FFFFFF;
+}
+.mesch-project-list th {
+   text-align: left;
+}
+.mesch-project-issue p {
+   margin: 10px 0px 10px 0px;
+}
+.mesch-project-issue-comment pre {
+   overflow: scroll;
+   border: 1px solid #D8D8D8;
+   background: #F2F2F2;
+   padding: 4px;
+}
+label {
+   width: 160px;
+   float: left;
+   text-align: left;
+   margin-right: 10px;
+}

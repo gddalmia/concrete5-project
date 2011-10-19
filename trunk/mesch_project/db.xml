@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<schema version="0.3">
+   <table name="MeschProjectTimeEntries">
+      <field name="timeEntryID" type="I">
+         <key/>
+         <unsinged/>
+         <autoincrement/>
+      </field>
+      <field name="projectcID" type="I"></field>
+      <field name="uID" type="I"></field>
+      <field name="cID" type="I"></field>
+      <field name="hours" type="I"></field>
+      <field name="spentOn" type="T"></field>
+      <field name="createdOn" type="T"></field>
+      <field name="comments" type="C" size="255"></field>
+
+      <index name="MeschProjectTimeEntries_ix1">
+         <col>uID</col>
+      </index>      
+   </table>  
+  
+   <table name="MeschProjectAccessdata">
+      <field name="accessdataId" type="I">
+         <key/>
+         <unsinged/>
+         <autoincrement/>
+      </field>
+      <field name="projectId" type="I"></field>
+      <field name="accessdataTypeId" type="C" size="255"></field>
+      <field name="name" type="C" size="255"></field>
+      <field name="userName" type="C" size="255"></field>
+      <field name="userPassword" type="C" size="255"></field>
+      <field name="serverName" type="C" size="255"></field>
+      <field name="databaseName" type="C" size="255"></field>
+      <index name="MeschProjectAccessdata_ix1">
+         <col>accessdataTypeId</col>
+      </index>      
+   </table>
+
+   <table name="MeschProjectAccessdataTypes">
+      <field name="accessdataTypeId" type="C" size="255">
+         <key/>
+      </field>
+      <field name="description" type="C" size="255"></field>
+      <sql>
+         <query>replace into btMeschManagementAccessdataTypes (accessdataTypeId, description) values ( 'c5_user', 'Concrete5 User' )</query>
+         <query>replace into btMeschManagementAccessdataTypes (accessdataTypeId, description) values ( 'ftp', 'FTP' )</query>
+         <query>replace into btMeschManagementAccessdataTypes (accessdataTypeId, description) values ( 'google', 'Google Account' )</query>
+         <query>replace into btMeschManagementAccessdataTypes (accessdataTypeId, description) values ( 'mail', 'Mail Account' )</query>
+         <query>replace into btMeschManagementAccessdataTypes (accessdataTypeId, description) values ( 'mail_admin', 'Mail Admin' )</query>
+         <query>replace into btMeschManagementAccessdataTypes (accessdataTypeId, description) values ( 'mysql', 'MySQL' )</query>
+         <query>replace into btMeschManagementAccessdataTypes (accessdataTypeId, description) values ( 'sftp', 'SFTP' )</query>
+         <query>replace into btMeschManagementAccessdataTypes (accessdataTypeId, description) values ( 'ssh', 'SSH' )</query>
+         <query>replace into btMeschManagementAccessdataTypes (accessdataTypeId, description) values ( 'switch', 'SWITCH' )</query>
+         <query>replace into btMeschManagementAccessdataTypes (accessdataTypeId, description) values ( 'weblication_user', 'Weblication User' )</query>
+         <query>replace into btMeschManagementAccessdataTypes (accessdataTypeId, description) values ( 'wordpress_user', 'Wordpress User' )</query>
+      </sql>       
+   </table>  
+</schema>
