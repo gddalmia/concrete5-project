@@ -98,7 +98,7 @@ echo '</div>';
 
 ?>            
 
-<form method="post" action="<?php echo $this->action('update')?>">
+<form method="post" action="<?php echo $this->action('update')?>" enctype="multipart/form-data">
 
 <?php echo t('Note') ?>
 <textarea name="text" style="width:100%;height:200px;"></textarea>
@@ -110,6 +110,8 @@ echo $ath->getAttributeForm($c, 'mesch_project_due_date') . '<br/>';
 echo $ath->getAttributeForm($c, 'mesch_project_assignee') . '<br/>';
 echo $ath->getAttributeForm($c, 'mesch_project_estimated_time') . '<br/>';
 ?>
+<label>Attachment</label>
+<input type="file" name="attachment"/>
 <br/>
 <input type="submit"/>
 

@@ -54,6 +54,31 @@ class IssuePageTypeController extends Controller {
       }     
    }
    
+   protected function importFile() {
+      $fID = 0;
+      if (is_uploaded_file($_FILES['attachment']['tmp_name'])) {
+         Loader::library('file/importer');
+         $fi = new FileImporter();
+
+         $resp = $fi->import($_FILES['attachment']['tmp_name'], $_FILES['attachment']['name']);
+         if (!$resp instanceof FileVersion) {
+            switch ($resp) {
+               case FileImporter::E_FILE_INVALID_EXTENSION:
+                  $this->set('message',t('File extension of attachment not allowed!'));
+                  return;
+                  break;
+               default:
+                  $this->set('message',t('Error during upload of attachment.'));
+                  return;
+                  break;
+            }
+         }
+         else {
+            $fID = $resp->getFileID();
+         }
+      }
+      return $fID;
+   }
 
    
    public function update() {
@@ -63,11 +88,14 @@ class IssuePageTypeController extends Controller {
       
       $txt = Loader::helper('text');
       
-      if ($_POST['text'] != '') {
+      $fID = $this->importFile();
+      
+      if ($_POST['text'] != '' || $fID != '') {
          $data = array();
          $data['text'] 		   = $txt->sanitize($_POST['text']);	// @TODO check this, it seems to cause problems with markdown
          $data['createdOn'] 	= date("Y-m-d H:i:s");
          $data['uID'] 	      = $u->getUserID();	
+         $data['fID'] 	      = $fID;	
                      
          $block = $c->addBlock(BlockType::getByHandle('mesch_project_comment'),'Issue Comments',$data);	
       }

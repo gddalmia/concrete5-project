@@ -37,6 +37,14 @@ echo "<div class=\"remo_board_message\">";
 	echo "</div>";
 	echo "<div class=\"remo_board_right_column\">";	
 		echo "<p>{$text}</p>";
+      
+      if ($fID > 0) {
+         $f = File::getByID($fID);
+         $fv = $f->getApprovedVersion();
+         $fvUrl = $fv->getURL();
+         $fvName = $fv->getFileName();
+         echo "<a href=\"{$fvUrl}\">{$fvName}</a>";
+      }
 	echo "</div>";
 	echo "<div class=\"clear\"></div>";
 echo "</div>";

@@ -18,6 +18,9 @@ html, body {
 }
 body  {
 }
+h2 {
+   margin-top: 20px;
+}
 #wrapper {
    background: url(images/background.png) repeat-x;
    margin: 0 auto;
@@ -74,20 +77,24 @@ body  {
 }
 
 /* styles for project page type */
-.mesch-project-list {
+.mesch-project-table {
    width: 100%;
-   border: 1px solid #D8D8D8;
+   border: 2px solid #36C;
 }
-.mesch-project-list thead tr:first-child {
-   background: #EEEEDD;
+.mesch-project-table thead tr:first-child {
+   background: #36C;
+   color: white;
 }
-.mesch-project-list tbody tr:nth-child(even) {
+.mesch-project-table thead tr:first-child th {
+   padding: 4px;
+}
+.mesch-project-table tbody tr:nth-child(even) {
    background: #EEEEEE;
 }
-.mesch-project-list tbody tr:nth-child(odd) {
+.mesch-project-table tbody tr:nth-child(odd) {
    background: #FFFFFF;
 }
-.mesch-project-list th {
+.mesch-project-table th {
    text-align: left;
 }
 .mesch-project-issue p {
@@ -98,6 +105,9 @@ body  {
    border: 1px solid #D8D8D8;
    background: #F2F2F2;
    padding: 4px;
+}
+.mesch-project-time-hour {
+   width: 45px;
 }
 label {
    width: 160px;
