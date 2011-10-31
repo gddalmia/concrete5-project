@@ -6,6 +6,7 @@
 			<unsigned />
 		</field>
 		<field name="uID" type="I"></field>	
+		<field name="fID" type="I"></field>	
 		<field name="text" type="X2"></field>	
 		<field name="createdOn" type="T"><NOTNULL/><DEFTIMESTAMP/></field>	
 	</table>

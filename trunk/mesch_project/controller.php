@@ -27,7 +27,7 @@ class MeschProjectPackage extends Package {
 
 	protected $pkgHandle = 'mesch_project';
 	protected $appVersionRequired = '5.4';
-	protected $pkgVersion = '0.0.60';
+	protected $pkgVersion = '0.0.65';
 
 	public function getPackageDescription() {
 		return t("Installs the Mesch Project Management package.");
@@ -69,6 +69,7 @@ class MeschProjectPackage extends Package {
 		$nat = AttributeType::getByHandle('number');
 		$dat = AttributeType::getByHandle('date_time');      
 		$tat = AttributeType::getByHandle('text');      
+		$fat = AttributeType::getByHandle('image_file');      
 		$sat = AttributeType::getByHandle('select');      
 		$uat = AttributeType::getByHandle('user_attribute');      
       
@@ -121,31 +122,13 @@ class MeschProjectPackage extends Package {
             
 		$nat = AttributeType::getByHandle('number');
 		$dat = AttributeType::getByHandle('date_time');      
-		$tat = AttributeType::getByHandle('text');      
+		$tat = AttributeType::getByHandle('text');     
+		$fat = AttributeType::getByHandle('image_file');     
 		$sat = AttributeType::getByHandle('select');   
 		$uat = AttributeType::getByHandle('user_attribute');   
       
       $pkg = Package::getByHandle('mesch_project');
-      
-      $testAttribute = CollectionAttributeKey::getByHandle('mesch_project_due_date');
-		if(!is_object($testAttribute)) {
-			CollectionAttributeKey::add($dat, array('akHandle' => 'mesch_project_due_date', 'akName' => t('Due Update'), 'akIsSearchable' => false), $pkg);               
-		}
-      
-      $testAttribute = CollectionAttributeKey::getByHandle('mesch_project_assignee');
-		if(!is_object($testAttribute)) {
-			CollectionAttributeKey::add($uat, array('akHandle' => 'mesch_project_assignee', 'akName' => t('Issue Assignee'), 'akIsSearchable' => false), $pkg);               
-		}      
-            
-      $testAttribute = CollectionAttributeKey::getByHandle('mesch_project_state');
-		if(!is_object($testAttribute)) {
-			$cak = CollectionAttributeKey::add($sat, array('akHandle' => 'mesch_project_state', 'akName' => t('State'), 'akIsSearchable' => false), $pkg);               
-         SelectAttributeTypeOption::add($cak, t('New'), 0);
-         SelectAttributeTypeOption::add($cak, t('Assigned'), 0);
-         SelectAttributeTypeOption::add($cak, t('In Progress'), 0);
-         SelectAttributeTypeOption::add($cak, t('Done'), 0);
-         SelectAttributeTypeOption::add($cak, t('Closed'), 0);
-		}
+
       
       
    }

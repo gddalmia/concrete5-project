@@ -26,4 +26,12 @@ defined('C5_EXECUTE') or die(_("Access Denied."));
 $dfh = Loader::helper('date_formatter', 'mesch_project');
 
 echo $text;
+
+if ($fID > 0) {
+   $f = File::getByID($fID);
+   $fv = $f->getApprovedVersion();
+   $fvUrl = $fv->getURL();
+   $fvName = $fv->getFileName();
+   echo "<a href=\"{$fvUrl}\">{$fvName}</a>";
+}
 ?>
