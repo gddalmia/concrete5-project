@@ -25,8 +25,11 @@ defined('C5_EXECUTE') or die(_("Access Denied."));
 
 class IssuePageTypeController extends Controller {
    public function view() {
+      $hh = Loader::helper('html');
       
-         
+      $this->addHeaderItem($hh->css('jquery.ui.css'));
+      $this->addHeaderItem($hh->css('ccm.calendar.css'));
+      $this->addHeaderItem($hh->javascript('jquery.ui.js'));               
    }
    
    public function getAssignee($returnLink=true) {
@@ -108,7 +111,9 @@ class IssuePageTypeController extends Controller {
          if (array_key_exists($collectionAttribute->akID,$_REQUEST['akID'])) {
             $collectionAttribute->setAttribute($c, $_REQUEST[$collectionAttribute->akID]);              
          }        
-      }                 
+      }         
+
+      $c->reindex();
                  
       $this->set('message', t('Issue updated'));      
    }

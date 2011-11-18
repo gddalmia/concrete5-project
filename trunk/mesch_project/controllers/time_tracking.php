@@ -25,7 +25,7 @@ defined('C5_EXECUTE') or die(_("Access Denied."));
 
 class TimeTrackingController extends Controller {
    
-   public function view() {
+   public function view($date=null) {
       $hh = Loader::helper('html');
       Loader::model('collection_types'); 
       
@@ -35,7 +35,9 @@ class TimeTrackingController extends Controller {
       
       $projectList = new PageList();
       $projectList->filterByCollectionTypeID($projectPageType->getCollectionTypeID());
+      //$projectList->filterByNumberOfChildren(0,'>'); //TODO, modify this to check for not closed sub pages
       $projectList->sortByName();
+      //$projectList->debug();
       $projects = $projectList->get();
       $this->set('projects', $projects);
       
@@ -45,6 +47,11 @@ class TimeTrackingController extends Controller {
       }
       
       $this->set('projectArray', join($projectArray, ','));
+      $this->set('date',         $date == '' ? date('Y-m-d') : $date );
+      
+      $this->addHeaderItem($hh->css('jquery.ui.css'));
+      $this->addHeaderItem($hh->css('ccm.calendar.css'));
+      $this->addHeaderItem($hh->javascript('jquery.ui.js'));
       
       $this->addHeaderItem($hh->css('jquery.autocomplete.css', 'mesch_project'));
       $this->addHeaderItem($hh->css('jquery.jgrowl.css', 'mesch_project'));

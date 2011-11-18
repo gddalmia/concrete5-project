@@ -95,7 +95,7 @@ echo '<table class="mesch-project-list mesch-project-table">';
          echo "<td>{$ath->getAttributeDisplay($issue,'mesch_project_priority',false)}</a>";
          echo "<td>{$ath->getAttributeDisplay($issue,'mesch_project_state',false)}</a>";
          echo "<td>{$ath->getAttributeDisplay($issue,'mesch_project_update',false)}</a>";
-         echo "<td>{$issue->getCollectionDatePublic(DATE_APP_GENERIC_MDYT)}</a>";
+         echo "<td>{$issue->getCollectionDatePublic(DATE_APP_GENERIC_MDY)}</a>";
          echo "</tr>";
       }
    echo '</tbody>';

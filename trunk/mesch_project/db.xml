@@ -7,6 +7,7 @@
          <autoincrement/>
       </field>
       <field name="projectID" type="I"></field>
+      <field name="invoiceID" type="I"></field>
       <field name="uID" type="I"></field>
       <field name="cID" type="I"></field>
       <field name="hours" type="N" size="6.2"></field>
@@ -17,8 +18,26 @@
       <index name="MeschProjectTimeEntries_ix1">
          <col>uID</col>
       </index>      
+      <index name="MeschProjectTimeEntries_ix2">
+         <col>invoiceID</col>
+      </index>      
    </table>  
   
+   <table name="MeschProjectInvoices">
+      <field name="invoiceID" type="I">
+         <key/>
+         <unsinged/>
+         <autoincrement/>
+      </field>
+      <field name="projectID" type="I"></field>
+      <field name="name" type="C" size="255"></field>
+      <field name="createdOn" type="T"></field>
+
+      <index name="MeschProjectInvoices_ix1">
+         <col>projectID</col>
+      </index>        
+   </table>  
+   
    <table name="MeschProjectAccessdata">
       <field name="accessdataId" type="I">
          <key/>
@@ -40,6 +59,30 @@
       </index>      
    </table>
 
+   <table name="MeschProjectReports">
+      <field name="reportID" type="I">
+         <key/>
+         <unsinged/>
+         <autoincrement/>
+      </field>
+      <field name="name" type="C" size="255"></field>
+      <field name="description" type="X2"></field>
+      <field name="query" type="X2"></field>
+   </table>  
+   
+   <table name="MeschProjectReportParameters">
+      <field name="reportParameterID" type="I">
+         <key/>
+         <unsinged/>
+         <autoincrement/>
+      </field>
+      <field name="parameterName" type="C" size="255">
+         <key/>
+      </field>
+      <field name="parameterType" type="C" size="255"></field>
+      <field name="parameterValue" type="X2"></field>
+   </table>  
+   
    <table name="MeschProjectAccessdataTypes">
       <field name="accessdataTypeId" type="C" size="255">
          <key/>

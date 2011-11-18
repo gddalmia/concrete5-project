@@ -79,12 +79,68 @@ h2 {
 /* styles for project page type */
 .mesch-project-table {
    width: 100%;
-   border: 2px solid #36C;
+    border: solid #ccc 1px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    -webkit-box-shadow: 0 1px 1px #ccc; 
+    -moz-box-shadow: 0 1px 1px #ccc; 
+    box-shadow: 0 1px 1px #ccc;
+	border-spacing: 0;	
+   /*border: 2px solid #36C;*/   
 }
-.mesch-project-table thead tr:first-child {
-   background: #36C;
-   color: white;
+/*.mesch-project-table thead tr:first-child {*/
+.mesch-project-table thead tr th {
+    background-color: #dce9f9;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#ebf3fc), to(#dce9f9));
+    background-image: -webkit-linear-gradient(top, #ebf3fc, #dce9f9);
+    background-image:    -moz-linear-gradient(top, #ebf3fc, #dce9f9);
+    background-image:     -ms-linear-gradient(top, #ebf3fc, #dce9f9);
+    background-image:      -o-linear-gradient(top, #ebf3fc, #dce9f9);
+    background-image:         linear-gradient(top, #ebf3fc, #dce9f9);
+    -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.8) inset; 
+    -moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;  
+    box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;        
+    border-top: none;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5); 
 }
+
+.mesch-project-table tbody tr td:first-child, .bordered th:first-child {
+    border-left: none;
+}
+
+.mesch-project-table thead tr th:first-child {
+    -moz-border-radius: 6px 0 0 0;
+    -webkit-border-radius: 6px 0 0 0;
+    border-radius: 6px 0 0 0;
+}
+
+.mesch-project-table thead tr  th:last-child {
+    -moz-border-radius: 0 6px 0 0;
+    -webkit-border-radius: 0 6px 0 0;
+    border-radius: 0 6px 0 0;
+}
+
+.mesch-project-table  tr:last-child td:first-child {
+    -moz-border-radius: 0 0 0 6px;
+    -webkit-border-radius: 0 0 0 6px;
+    border-radius: 0 0 0 6px;
+}
+
+.mesch-project-table tr:last-child td:last-child {
+    -moz-border-radius: 0 0 6px 0;
+    -webkit-border-radius: 0 0 6px 0;
+    border-radius: 0 0 6px 0;
+}
+.mesch-project-table td, .mesch-project-table th {
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    padding: 4px;
+    text-align: left;    
+}
+
+
+
 .mesch-project-table thead tr:first-child th {
    padding: 4px;
 }
@@ -94,8 +150,17 @@ h2 {
 .mesch-project-table tbody tr:nth-child(odd) {
    background: #FFFFFF;
 }
+.mesch-project-table tbody a {
+   text-decoration: none;
+   color: #36C;
+}
+.mesch-project-table tbody a:hover {
+   text-decoration: underline;
+   color: black;
+}
 .mesch-project-table th {
    text-align: left;
+   
 }
 .mesch-project-issue p {
    margin: 10px 0px 10px 0px;
@@ -114,4 +179,38 @@ label {
    float: left;
    text-align: left;
    margin-right: 10px;
+}
+.mesch-project-tree-list ul {
+   margin-left: 20px;
+}
+
+.searchResult a {
+   color: #36C;
+   text-decoration: none;
+}
+.searchResult a:hover {
+   text-decoration: underline;
+   color: black;
+}
+.mesch-project-button {
+   background-color: #dce9f9;
+   background-image: -webkit-gradient(linear, left top, left bottom, from(#ebf3fc), to(#dce9f9));
+   background-image: -webkit-linear-gradient(top, #ebf3fc, #dce9f9);
+   background-image:    -moz-linear-gradient(top, #ebf3fc, #dce9f9);
+   background-image:     -ms-linear-gradient(top, #ebf3fc, #dce9f9);
+   background-image:      -o-linear-gradient(top, #ebf3fc, #dce9f9);
+   background-image:         linear-gradient(top, #ebf3fc, #dce9f9);
+   -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.8) inset; 
+   -moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;  
+   box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;        
+   border: 1px solid #ccc;
+   padding: 4px 6px 4px 6px;
+   text-shadow: 0 1px 0 rgba(255,255,255,.5); 
+   -moz-border-radius: 6px;
+   -webkit-border-radius: 6px;
+   border-radius: 6px;   
+   font-size: 13px;
+}
+.mesch-project-growl-error {
+   background-color: red ! important;
 }

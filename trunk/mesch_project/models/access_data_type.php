@@ -1,4 +1,4 @@
-<?php
+<?php 
 /*
 mesch.ch project management
 
@@ -21,11 +21,28 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-class DateFormatterHelper {
-	public function formatDate($time, $format=DATE_APP_GENERIC_MDYT) {
-		if ($time == '') return '';
-		
-		return date($format, $time);		
-	}
+defined('C5_EXECUTE') or die("Access Denied.");
+
+class AccessDataType extends Object {
+   private $data;
+   
+   public function AccessDataType($data) {
+      $this->data = $data;
+   }
+   
+   public function __get($key) {
+      return $this->data[$key];
+   }   
+   
+   public static function getList() {
+      $db = Loader::db();
+      $ret = array();
+      $table = $db->GetAll('SELECT accessdataTypeId, description FROM MeschProjectAccessdataTypes ORDER BY description');
+      foreach ($table as $row) {
+         $ret[] = new AccessDataType($row);
+      }
+      return $ret;
+   }
+
 }
 ?>

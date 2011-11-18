@@ -21,14 +21,21 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-
+$dtt = Loader::helper('form/date_time');
 ?>
 <script type="text/javascript">
 
+function getSelectedDate() {
+   var selectedDate = $('#mesch-project-time-date').datepicker('getDate');
+   return (selectedDate.getYear()+1900) + "-" + (selectedDate.getMonth()+1) + "-" + selectedDate.getDate();   
+}
 
 function loadEntries() {
-   var date = $("#mesch-project-time-date").val();
-
+   // clear everything
+   $("#mesch-time-tracking input").val("").removeData("cID").removeData("pID").removeData("toBeInitialized");
+   
+   // fetch entries
+   var date  = getSelectedDate();
    var data = {"date": date};
    $.post("<?php echo View::url('/time_tracking/getTimeEntries/')?>", data, function(response) {
       var currentResponseID = 0;
@@ -75,6 +82,7 @@ function initializeIssueLists() {
          $(".mesch-project-time-issue-list:data(toBeInitialized=1):data(pID="+pID+")").autocomplete(data.entries, {
             autoFill: false,
             minChars: 0,
+            max: 500,
             formatItem: function(row, i, max) {
                return row.name;
             },
@@ -93,13 +101,12 @@ function initializeIssueLists() {
 }
 
 
-$(document).ready(function() {
-
-   loadEntries();
+$(document).ready(function() {  
    
    var projects = [<?php echo $projectArray; ?>];
    $(".mesch-project-time-project-list").autocomplete(projects, {
       autoFill: false,
+      max: 500,
       minChars: 0,
 		formatItem: function(row, i, max) {
 			return row.name;
@@ -134,43 +141,113 @@ $(document).ready(function() {
       
       var entries = new Array();
       
+      
+      
+      // build object structure
+      var hasMissingValues = false;
       $("#mesch-time-tracking-form tbody tr").each(function(e,v) {
          var timeEntryID = $(this).find(".mesch-project-time-id").val();
          var pID = $(this).find(".mesch-project-time-project-list").data("cID");
          var cID = $(this).find(".mesch-project-time-issue-list").data("cID");
          var hours = $(this).find(".mesch-project-time-hour").val();
          var comment = $(this).find(".mesch-project-time-comment").val();
-                  
+         
+         // check if mandatory fields have a value         
+         $(this).find("input").css({"background": "white"});
+
+         if (pID != void null || cID != void null || hours != "" || comment != "") {
+            if (pID == void null || cID == void null || hours == "") {
+               $(this).find("input").css({"background": "#FFAAAA"});
+               hasMissingValues = true;
+            }
+         }         
+          
          if (pID != void null && cID != void null && hours != 0) {
             entries.push({"timeEntryID": timeEntryID, "pID": pID, "cID": cID, "hours": hours, "comment": comment});
          }
       });
-      var data = {"date": "2011-10-31", "entries": entries};
-      $.post("<?php echo View::url('/time_tracking/saveTimeEntries/')?>", data, function(response) {
-         $("#mesch-project-time-sum-day").html(response.sumHours);
-         
-         var currentResponseID = 0;
-         for (var timeEntryID in response.entries) {
-            $("#mesch-project-time-id-" + currentResponseID++).val(response.entries[timeEntryID].timeEntryID);
-         }
-         
-         $.jGrowl("<?php echo t('Time entries saved!') ?>");         
       
-      }, "json");
-      
+      if (hasMissingValues) {
+         $.jGrowl("<?php echo t('Time entries NOT saved due to missing values!') ?>");     
+      }
+      else {         
+         //var data = {"date": $("#mesch-project-time-date").val(), "entries": entries};
+         var data = {"date": getSelectedDate(), "entries": entries};
+         var dataSaved = false;
+         $.post("<?php echo View::url('/time_tracking/saveTimeEntries/')?>", data, function(response) {
+         
+            $("#mesch-project-time-sum-day").html(response.sumHours);
+            
+            var currentResponseID = 0;
+            for (var timeEntryID in response.entries) {
+               $("#mesch-project-time-id-" + currentResponseID++).val(response.entries[timeEntryID].timeEntryID);
+            }
+            
+            dataSaved = true;
+            $.jGrowl("<?php echo t('Time entries saved!') ?>");         
+         
+         }, "json");
+         
+         /*if (!dataSaved) {            
+            $.jGrowl("<?php echo t('Time entries NOT saved, please contact development team!') ?>",{theme:'mesch-project-growl-error', sticky: true});
+
+         }*/
+      }
    });
 
 });
 
 </script>
 
+
+<div style="float:left;padding-top:5px;">
+   <?php
+   print $dtt->date('mesch-project-time-date', null, true);
+   ?>
+
+   <script type="text/javascript">
+   $(document).ready(function() {
+
+      regExp = /(\d{4})-(\d{2})-(\d{2})/g;
+      dateArray = regExp.exec("<?php echo $date?>"); 
+
+      $('#mesch-project-time-date').datepicker('setDate', new Date(dateArray[1],dateArray[2]-1,dateArray[3]));
+      
+      
+      $('#mesch-project-time-date').change(function() {
+         
+         window.location = "<?php echo View::url('/time_tracking') ?>" + getSelectedDate(); 
+         
+         // this is tricky because autocomplete stays initialized
+         // couldn't find a method to remove existing autocomplete
+         // complete reload seems easier..
+         
+         //loadEntries();
+      });
+
+      
+      loadEntries();
+   });
+   </script>   
+</div>
+<div style="float:left;padding:5px;">
+   <span id="mesch-project-time-sum-day"></span> <?php echo t('h')?>
+</div>
+<div style="float:left;padding:5px 0px 0px 295px">
+   <button accesskey="s" class="mesch-project-button" id="mesch-project-time-save" title="<?php echo t('Save time entries (Alt+S)')?>"><?php echo t('Save')?></button>
+
+</div>
+<div style="clear:both;"></div>
+
 <form id="mesch-time-tracking-form">
-<?php echo t('Date:')?> <input type="text" id="mesch-project-time-date" name="date" readonly="readonly" value="<?php echo date('Y-m-d') ?>"/>
+<div style="display:none;">
+   <?php echo t('Date:')?> <input type="text" id="mesch-project-time-dateXXX" name="mesch-project-time-dateXXX"/>
+</div>
 <br/>
-<table id="mesch-time-tracking">
+<table id="mesch-time-tracking" class="mesch-project-table" style="width:auto ! important;">
    <thead>
       <tr>
-         <th colspan="2"><?php echo t('Project')?></th>
+         <th><?php echo t('Project')?></th>
          <th><?php echo t('Issue')?></th>
          <th><?php echo t('Hours')?></th>
          <th><?php echo t('Comment')?></th>
@@ -178,24 +255,23 @@ $(document).ready(function() {
    </thead>
    <tbody>
       <?php for($i=0;$i<20;$i++) { ?>
-         <tr id="mesch-project-time-row-<?php echo $i?>">
-            <td><input type="hidden" name="timeEntryID[]" class="mesch-project-time-id" id="mesch-project-time-id-<?php echo $i?>"/></td>
-            <td><input type="text" name="project[]" class="mesch-project-time-project-list"/></td>
-            <td><input type="text" name="issue[]" class="mesch-project-time-issue-list"/></td>
-            <td><input type="text" name="hours[]" class="mesch-project-time-hour"/></td>
-            <td><input type="text" name="comments[]" class="mesch-project-time-comment"/></td>
+         <tr class="mesch-project-time-row" id="mesch-project-time-row-<?php echo $i?>">
+            <td>
+               <input type="hidden" name="timeEntryID[]" class="mesch-project-time-id" id="mesch-project-time-id-<?php echo $i?>"/>
+               <input type="text" name="project[]" class="mesch-project-time-project-list"/>
+            </td>
+            <td>
+               <input type="text" name="issue[]" class="mesch-project-time-issue-list"/>
+            </td>
+            <td>
+               <input type="text" name="hours[]" class="mesch-project-time-hour"/>
+            </td>
+            <td>
+               <input type="text" name="comments[]" class="mesch-project-time-comment"/>
+            </td>
          </tr>  
       <?php } ?>
    </tbody>
-   <tfoot>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td id="mesch-project-time-sum-day"></td>
-      <td></td>
-   </tfoot>
 </table>
-
-<a href="" id="mesch-project-time-save">Save</a>
 
 </form>
