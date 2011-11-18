@@ -140,6 +140,37 @@ class MeschProjectPackage extends Package {
 	public function uninstall() {
       return parent::uninstall();      
    }
+   
+   public function on_start() {
+     	$html = Loader::helper('html');
+      $uh = Loader::helper('concrete/urls');
+      $v = View::getInstance();
+      
+      if(version_compare(APP_VERSION,'5.4.1.1', '>')){
+         $ihm = Loader::helper('concrete/interface/menu');
+
+         $ihm->addPageHeaderMenuItem('new_project', t('New Project'), 'left', array(
+            'dialog-title'    => t('New Project'),
+            'href'            => $uh->getToolsUrl('new_project', 'mesch_project'),
+            'dialog-on-open'  => "$(\'#ccm-page-edit-nav-new_project\').removeClass(\'ccm-nav-loading\')",
+            'dialog-modal'    => "false",
+            'dialog-width'    => '800',
+            'dialog-height'   => "500",
+            'class'           => 'dialog-launch'
+         ), 'mesch_project');
+         
+         $ihm->addPageHeaderMenuItem('new_issue', t('New Issue'), 'left', array(
+            'dialog-title'    => t('New Issue'),
+            'href'            => $uh->getToolsUrl('new_issue', 'mesch_project'),
+            'dialog-on-open'  => "$(\'#ccm-page-edit-nav-new_issue\').removeClass(\'ccm-nav-loading\')",
+            'dialog-modal'    => "false",
+            'dialog-width'    => '600',
+            'dialog-height'   => "400",
+            'class'           => 'dialog-launch'
+         ), 'mesch_project');
+      }
+   
+   }
 
 }
 ?>

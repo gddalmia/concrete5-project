@@ -105,11 +105,10 @@ echo '<table class="mesch-project-list mesch-project-table">';
          echo $this->controller->getPagination();
          echo '</td>';
       echo '</tr>';
-      echo '<tr>';
+      /*echo '<tr>';
          echo '<td colspan="7">';
          
          // form to add new issue
-
          echo "<form method=\"post\" action=\"{$this->action('new_issue')}\" enctype=\"multipart/form-data\">
             <label>Subject</label> <input type=\"text\" name=\"subject\"/><br/>
             " . $ath->getAttributeForm(null,'mesch_project_assignee',true) . "<br/>
@@ -122,7 +121,7 @@ echo '<table class="mesch-project-list mesch-project-table">';
          </form>";
 
          echo '</td>';
-      echo '</tr>';      
+      echo '</tr>';  */    
    echo '</tfoot>';
 echo '</table>';
 
