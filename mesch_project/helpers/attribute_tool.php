@@ -27,20 +27,27 @@ class AttributeToolHelper {
       Loader::model('collection_attributes');
       $ret = '';
             
-      $priorityAttribute = CollectionAttributeKey::getByHandle($attributeHandle);
+      $attribute = CollectionAttributeKey::getByHandle($attributeHandle);
+	  
       if ($collection != null) {
-         $value = $collection->getAttributeValueObject($priorityAttribute);
+         $value = $collection->getAttributeValueObject($attribute);
       }
       
       if ($printLabel) {
-         $ret  = "<label>" . $priorityAttribute->getAttributeKeyName() . "</label>";
+         $ret  = "<label>" . $attribute->getAttributeKeyName() . "</label>";
       }
             
       $attributeValue = '';
       if ($collection != null) {
-         $attributeValue = $collection->getAttribute($attributeHandle);
-      }
-      if ($priorityAttribute->getAttributeType()->getAttributeTypeHandle() == 'user_attribute') {
+         if ($value != null) {
+			//$attributeValue = $attribute->getAttributeValue($value->getAttributeValueID(), 'getValue');
+			$attributeValue = $value->getValue('Display');
+		 }
+		 else {
+			$attributeValue = $collection->getAttribute($attributeHandle);		 
+		 }
+	  }
+      if ($attribute->getAttributeType()->getAttributeTypeHandle() == 'user_attribute') {
          if ($attributeValue == '') return;
          $ui = UserInfo::getByID($attributeValue);
          $ret .= $ui->getUserName();
@@ -48,7 +55,7 @@ class AttributeToolHelper {
       else {
          $ret .= $attributeValue;
       }      
-      
+      //return get_class($attribute);
       return $ret;
    }   
 
@@ -56,16 +63,16 @@ class AttributeToolHelper {
       Loader::model('collection_attributes');
       $ret = '';      
       
-      $priorityAttribute = CollectionAttributeKey::getByHandle($attributeHandle);
+      $attribute = CollectionAttributeKey::getByHandle($attributeHandle);
       $value = '';
       if ($collection != null) {
-         $value = $collection->getAttributeValueObject($priorityAttribute);
+         $value = $collection->getAttributeValueObject($attribute);
       }
       
       if ($printLabel) {
-         $ret  = "<label>" . $priorityAttribute->getAttributeKeyName() . "</label>";
+         $ret  = "<label>" . $attribute->getAttributeKeyName() . "</label>";
       }
-      $ret .= $priorityAttribute->render('form',$value,true);
+      $ret .= $attribute->render('form',$value,true);
       
       return $ret;
    }

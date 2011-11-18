@@ -32,6 +32,10 @@ class MeschProjectCommentBlockController extends BlockController {
 		return t("Issue Comment.");
 	}
 	
+   public function getSearchableContent(){
+      return $this->text;
+   }
+      
 	public function getBlockTypeName() {
 		return t("Issue Comment");
 	}
@@ -120,6 +124,11 @@ class MeschProjectCommentBlockController extends BlockController {
 		$data['fID'] 	      = $args['fID'];
 		$data['text'] 		   = $args['text'];
 		$data['createdOn'] 	= $args['createdOn'];
+      
+      if (!isset($this->c)) {
+         global $c;
+         $this->c = $c;
+      }
       
       $this->c->setAttribute('mesch_project_update', $args['createdOn']);
 		

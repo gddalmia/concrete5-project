@@ -31,6 +31,8 @@ class ProjectPageTypeController extends Controller {
    public function view() {
       global $c;
       
+      $hh = Loader::helper('html');
+      
       Loader::model('page_list');
       Loader::model('user_list'); 
       Loader::model('access_data', 'mesch_project'); 
@@ -66,6 +68,10 @@ class ProjectPageTypeController extends Controller {
       $this->accessDataTypes = AccessDataType::getList();
       $this->set('access_data', AccessData::getByCollectionID($c->getCollectionID()));
       $this->set('access_data_types', $this->accessDataTypes);
+
+      $this->addHeaderItem($hh->css('jquery.ui.css'));
+      $this->addHeaderItem($hh->css('ccm.calendar.css'));
+      $this->addHeaderItem($hh->javascript('jquery.ui.js'));      
    }
    
    public function getAccessDataTypeForm($selectedValue='') {

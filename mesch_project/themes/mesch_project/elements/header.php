@@ -36,7 +36,6 @@ defined('C5_EXECUTE') or die(_("Access Denied."));
    <title>Concrete5 Theme</title>
    
    <link rel="stylesheet" media="screen" type="text/css" href="<?php echo $this->getThemePath()?>/main.css" />
-   <link rel="stylesheet" media="screen" type="text/css" href="<?php echo $this->getThemePath()?>/typography.css" />
    <script src="<?php echo $this->getThemePath()?>/modernizr-1.7.min.js"></script>
       
    <?php  Loader::element('header_required'); ?>

@@ -91,7 +91,8 @@ foreach ($childPages as $childPageID) {
 }*/
             
 // import redmine data
-$result = $db->Execute('SELECT * FROM projects LIMIT ?,?', array($limitFrom, $limitCount));
+//$result = $db->Execute('SELECT * FROM projects  LIMIT ?,?', array($limitFrom, $limitCount));
+$result = $db->Execute('SELECT * FROM projects WHERE id=48');
 while ($row = $result->FetchRow()) {
    $ctProject = CollectionType::getByHandle('project');
    $ctIssue = CollectionType::getByHandle('issue');
@@ -185,6 +186,24 @@ while ($row = $result->FetchRow()) {
       
       unset($newIssuePage);
    }
+   
+   // add time entries without issue connected to it
+   $resultTimeEntries = $db->Execute('SELECT round(te.hours,2) hours, te.comments, te.spent_on, te.created_on,
+      (select uu.uID from users_redmine u inner join Users uu on  u.login=uu.uName where u.id=te.user_id) userID FROM time_entries te WHERE te.project_id=? and te.issue_id is null', 
+      array($row['id']));
+   while ($rowTimeEntries = $resultTimeEntries->FetchRow()) {
+      $db->Execute('INSERT INTO MeschProjectTimeEntries (projectID, uID, cID, hours, spentOn, createdOn, comment) VALUES (?,?,?,?,?,?,?)',
+         array(
+            $newProjectPage->getCollectionID(),
+            $rowTimeEntries['userID'],
+            '',
+            $rowTimeEntries['hours'],
+            $rowTimeEntries['spent_on'],
+            $rowTimeEntries['created_on'],
+            $rowTimeEntries['comments']
+         ));
+   }
+   unset($resultTimeEntries);   
    
    unset($newProjectPage);
 }

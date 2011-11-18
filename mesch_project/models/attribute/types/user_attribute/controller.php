@@ -25,13 +25,17 @@ defined('C5_EXECUTE') or die("Access Denied.");
 
 class UserAttributeAttributeTypeController extends AttributeTypeController  {
 
-	protected $searchIndexFieldDefinition = '';
+	protected $searchIndexFieldDefinition = 'N 14 DEFAULT 0 NULL';
 
 	public function getValue() {
 		$db = Loader::db();
 		$value = $db->GetOne("select value from atUserAttribute where avID = ?", array($this->getAttributeValueID()));
 		return $value;	
 	}
+
+   public function getSearchIndexValue() { 
+      return $this->getValue();
+   }   
    
 	public function searchForm($list) {
 		$list->filterByAttribute($this->attributeKey->getAttributeKeyHandle(), $this->request('value'), '=');

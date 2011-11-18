@@ -27,7 +27,7 @@ class MeschProjectPackage extends Package {
 
 	protected $pkgHandle = 'mesch_project';
 	protected $appVersionRequired = '5.4';
-	protected $pkgVersion = '0.0.65';
+	protected $pkgVersion = '0.0.68';
 
 	public function getPackageDescription() {
 		return t("Installs the Mesch Project Management package.");
@@ -107,11 +107,19 @@ class MeschProjectPackage extends Package {
          SelectAttributeTypeOption::add($cak, t('Done'), 0);
          SelectAttributeTypeOption::add($cak, t('Closed'), 0);
 		}
+      
       // install single pages
-		$sp1 = SinglePage::add('/time_tracking', $pkg);
-		$sp1->update(array('cName'=>t('Time Tracking'), 'cDescription'=>t('Time Tracking.'))); 
+		$sp1 = SinglePage::add('/overview', $pkg);
+		$sp1->update(array('cName'=>t('Overview'), 'cDescription'=>t('Overview.'))); 
+      
+		$sp2 = SinglePage::add('/time_tracking', $pkg);
+		$sp2->update(array('cName'=>t('Time Tracking'), 'cDescription'=>t('Time Tracking.'))); 
 
+		$sp3 = SinglePage::add('/reports', $pkg);
+		$sp3->update(array('cName'=>t('Reports'), 'cDescription'=>t('Reports.'))); 
 
+		$sp4 = SinglePage::add('/invoice', $pkg);
+		$sp4->update(array('cName'=>t('Invoice'), 'cDescription'=>t('Invoice.'))); 
 	}
    
    public function upgrade() {		
@@ -125,12 +133,8 @@ class MeschProjectPackage extends Package {
 		$tat = AttributeType::getByHandle('text');     
 		$fat = AttributeType::getByHandle('image_file');     
 		$sat = AttributeType::getByHandle('select');   
-		$uat = AttributeType::getByHandle('user_attribute');   
-      
-      $pkg = Package::getByHandle('mesch_project');
+		$uat = AttributeType::getByHandle('user_attribute'); 
 
-      
-      
    }
 		
 	public function uninstall() {
