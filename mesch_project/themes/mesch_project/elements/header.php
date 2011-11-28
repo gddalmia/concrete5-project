@@ -47,6 +47,8 @@ defined('C5_EXECUTE') or die(_("Access Denied."));
    <div id="wrapper">
 
       <nav id="navigation">
+         <a href="/">Home</a>
+         
          <?php
          $nh = Loader::helper('navigation');
          
@@ -55,6 +57,10 @@ defined('C5_EXECUTE') or die(_("Access Denied."));
             $child = Page::getByID($childPageId);
             
             if ($child->isSystemPage()) continue;
+            
+            $p = new Permissions($child);
+            if (!$p->canRead()) continue;
+               
             
             echo "<a href=\"{$nh->getLinkToCollection($child)}\">{$child->getCollectionName()}</a>";
          }

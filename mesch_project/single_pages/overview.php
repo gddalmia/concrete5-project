@@ -25,36 +25,72 @@ defined('C5_EXECUTE') or die(_("Access Denied."));
 
 $ath = Loader::helper('attribute_tool', 'mesch_project'); 
 $nh = Loader::helper('navigation'); 
+$th = Loader::helper('text'); 
 
-echo '<table class="mesch-project-table">';
-echo '<thead>';
-echo '<th>' . t('#') . '</th>';
-echo '<th>' . t('Project') . '</th>';
-echo '<th>' . t('Issue') . '</th>';
-echo '<th>' . t('Priority') . '</th>';
-echo '<th>' . t('State') . '</th>';
-echo '<th>' . t('Last Update') . '</th>';
-echo '<th>' . t('Due Date') . '</th>';
-echo '</thead>';
-echo '<tbody>';
-foreach ($issues as $issue) {
-   $parentPage = Page::getByID($issue->getCollectionParentID());
+echo '<div style="float:left;width:60%;">';
+   echo "<h2>" . t('Issues assigned to me') . "</h2>";
    
-   $projectLink = $nh->getLinkToCollection($parentPage); 
-   $issueLink = $nh->getLinkToCollection($issue); 
-   
-   echo '<tr>';
-   echo "<td><a href=\"{$issueLink}\">{$issue->getCollectionID()}</a></td>";
-   echo "<td><a href=\"{$projectLink}\">{$parentPage->getCollectionName()}</a></td>";
-   echo "<td><a href=\"{$issueLink}\">{$issue->getCollectionName()}</a></td>";
-   
-   echo "<td>{$ath->getAttributeDisplay($issue,'mesch_project_priority',false)}</a>";
-   echo "<td>{$ath->getAttributeDisplay($issue,'mesch_project_state',false)}</a>";
-   echo "<td>{$ath->getAttributeDisplay($issue,'mesch_project_update',false)}</a>";   
-   echo "<td>{$ath->getAttributeDisplay($issue,'mesch_project_due_date',false)}</a>";   
+   echo '<table class="mesch-project-table">';
+   echo '<thead>';
+   echo '<th>' . t('#') . '</th>';
+   echo '<th>' . t('Project') . '</th>';
+   echo '<th>' . t('Issue') . '</th>';
+   echo '<th>' . t('Priority') . '</th>';
+   echo '<th>' . t('State') . '</th>';
+   echo '<th>' . t('Last Update') . '</th>';
+   echo '<th>' . t('Due Date') . '</th>';
+   echo '</thead>';
+   echo '<tbody>';
+   foreach ($issues as $issue) {
+      $parentPage = Page::getByID($issue->getCollectionParentID());
+      
+      $projectLink = $nh->getLinkToCollection($parentPage); 
+      $issueLink = $nh->getLinkToCollection($issue); 
+      
+      echo '<tr>';
+      echo "<td><a href=\"{$issueLink}\">{$issue->getCollectionID()}</a></td>";
+      echo "<td><a href=\"{$projectLink}\">{$parentPage->getCollectionName()}</a></td>";
+      echo "<td><a href=\"{$issueLink}\">{$issue->getCollectionName()}</a></td>";
+      
+      echo "<td>{$ath->getAttributeDisplay($issue,'mesch_project_priority',false)}</a>";
+      echo "<td>{$ath->getAttributeDisplay($issue,'mesch_project_state',false)}</a>";
+      echo "<td>{$ath->getAttributeDisplay($issue,'mesch_project_update',false)}</a>";   
+      echo "<td>{$ath->getAttributeDisplay($issue,'mesch_project_due_date',false)}</a>";   
 
-   echo '</tr>';
-}
-echo '</tbody>';
-echo '</table>';
+      echo '</tr>';
+   }
+   echo '</tbody>';
+   echo '</table>';
+
+echo '</div>';   
+echo '<div style="float:left;width:39%;margin-left: 10px;">';
+   echo "<h2>" . t('Overall Activity') . "</h2>";
+   
+   echo '<table class="mesch-project-table">';
+   echo '<thead>';
+   echo '<th>' . t('#') . '</th>';
+   echo '<th>' . t('Issue') . '</th>';
+   echo '<th>' . t('Text') . '</th>';
+   echo '<th>' . t('Author') . '</th>';
+   echo '<th>' . t('Date') . '</th>';
+   echo '</thead>';
+   echo '<tbody>';   
+   
+   foreach ($activities as $activity) {
+   
+      $issuePage = Page::getByID($activity['cID']);
+      $issueLink = $nh->getLinkToCollection($issuePage); 
+      
+      echo "<tr>";
+      echo "<td><a href=\"{$issueLink}\">{$activity['cID']}</a></td>";
+      echo "<td><a href=\"{$issueLink}\">{$activity['cvName']}</a></td>";
+      echo "<td>" . $th->shorten($activity['text'],100) . "</td>";
+      echo "<td>{$activity['uName']}</td>";
+      echo "<td>{$activity['createdOn']}</td>";
+      echo "</tr>";
+   }
+   echo '</tbody>';
+   echo '</table>';
+   
+echo '</div>';   
 ?>

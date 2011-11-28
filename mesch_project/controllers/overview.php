@@ -26,6 +26,7 @@ defined('C5_EXECUTE') or die(_("Access Denied."));
 class OverviewController extends Controller {
    
    public function view() {
+      $db = Loader::db();
       $hh = Loader::helper('html');
       Loader::model('collection_types');
       Loader::model('page_list');
@@ -48,6 +49,14 @@ class OverviewController extends Controller {
       
       $issues = $issueList->get();
       $this->set('issues', $issues);
+      
+      // get latest activity
+      $this->set('activities', $db->GetAll('SELECT cv.cID, cv.cvName, mpc.text, mpc.createdOn, u.uName
+         FROM btMeschProjectComment mpc INNER JOIN CollectionVersionBlocks cvb ON mpc.bID=cvb.bID
+         INNER JOIN CollectionVersions cv ON cv.cID=cvb.cID AND cv.cvID=cvb.cvID AND cv.cvIsApproved=1
+         INNER JOIN Users u ON mpc.uID=u.uID
+         ORDER BY cvb.bID DESC
+         LIMIT 0, 20'));
       
    }
    

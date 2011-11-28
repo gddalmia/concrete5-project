@@ -37,8 +37,9 @@ if (isset($message)) {
 
 $parentProject = Page::getByID($c->getCollectionParentID());
 
+echo '<h1><a href="' . $nh->getLinkToCollection($parentProject) . '">' . $parentProject->getCollectionName() . '</a> :: <a href=".">' . $c->getCollectionName() . '</a></h1>';
+
 echo '<div class="mesch-project-issue">';
-echo '<h1><a href="' . $nh->getLinkToCollection($parentProject) . '">' . $parentProject->getCollectionName() . '</a> :: ' . $c->getCollectionName() . '</h1>';
 
 $cuID = $c->getCollectionUserID();
 $ui = UserInfo::getByID($cuID);

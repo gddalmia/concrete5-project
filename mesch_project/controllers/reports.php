@@ -31,9 +31,18 @@ class ReportsController extends Controller {
       Loader::model('collection_types');
       Loader::model('page_list');
      
-      $reports = $db->GetAll('SELECT reportID, name FROM MeschProjectReports ORDER BY name');
+      /*$reports = $db->GetAll('SELECT reportID, name FROM MeschProjectReports ORDER BY name');
       
-      $this->set('reports', $reports);
+      $this->set('reports', $reports);*/
+      
+      $methods = get_class_methods($this);
+      $reportMethods = array();
+      foreach ($methods as $method) {
+         if (substr($method, 0, 6) == 'report') {
+            $reportMethods[] = $method;
+         }
+      }
+      $this->set('reports', $reportMethods);
    }
    
    public function show($reportID) {
@@ -50,6 +59,97 @@ class ReportsController extends Controller {
       
       $this->set('reportOutput', $reportOutput);
    }
+   
+   protected function buildTable($adodbResult) {
+      $ret = '';
+      $headerAdded = false;
+      while ($row = $adodbResult->FetchRow()) {
+         // build header row if necessary
+         if (!$headerAdded) {
+            $ret = "<table class=\"mesch-project-table\" style=\"width:auto!important;\"><thead><tr>";
+            foreach ($row as $rowKey => $rowValue) {
+               $ret .= "<th>{$rowKey}</th>";
+            }
+            $ret .= "</tr></thead><tbody>";
+            $headerAdded = true;
+         }         
+         
+         // add data rows
+         $ret .= "<tr>";
+         foreach ($row as $rowKey => $rowValue) {
+            $ret .= "<td>{$rowValue}</td>";
+         }
+         $ret .= "</tr>";
+      }
+      if ($headerAdded) {
+         $ret .= "</tbody></table>";
+      }
+      return $ret;
+   }
+   
+   public function report_last_month_for_current_user($action) {
+      $u = new User();
+      $db = Loader::db();
+      
+      $result = $db->Execute('select cvName project_name,sum(hours) hours
+         from MeschProjectTimeEntries mpte 
+         inner join Collections c on mpte.projectID=c.cID
+         inner join CollectionVersions cv on c.cID=cv.cID and cv.cvIsApproved=1
+         where uID=? and year(spentOn)=year(now()) and month(spentOn)=month(now())
+         group by projectID,cvName
+         order by cvName', array($u->getUserID()));
+
+      $reportOutput = '<h2>Hours for last month</h2>' . $this->buildTable($result);
+      
+      $this->set('reportOutput', $reportOutput);
+   }
+
+   public function report_hours_per_month_and_year($action) {
+      $u = new User();
+      $db = Loader::db();
+      
+      $result = $db->Execute('select year(spentOn) year,month(spentOn) month,sum(hours) hours
+         from MeschProjectTimeEntries mpte 
+         where uID=?
+         group by year(spentOn),month(spentOn)
+         order by year(spentOn),month(spentOn)', array($u->getUserID()));
+
+      $reportOutput = '<h2>Hours per Month and Year</h2>' . $this->buildTable($result);
+
+      $this->set('reportOutput', $reportOutput);
+   }   
+   
+   public function report_unbilled_hours_from_last_year($action) {
+      $u = new User();
+      $db = Loader::db();
+      
+      $result = $db->Execute('SELECT cv.cvName project_name,year(spentOn) year, month(spentOn) month, sum(hours) hours FROM MeschProjectTimeEntries mpte
+         INNER JOIN Collections c ON mpte.projectID=c.cID
+         INNER JOIN CollectionVersions cv ON cv.cID=c.cID AND cv.cvIsApproved=1
+         WHERE invoiceID IS NULL and year(spentOn)<year(now())
+         GROUP BY cv.cvName,year(spentOn), month(spentOn)
+         ORDER BY cv.cvName');
+
+      $reportOutput = '<h2>Unbilled hours from last year</h2>' . $this->buildTable($result);
+
+      $this->set('reportOutput', $reportOutput);
+   }   
+
+   public function report_time_entries_last_30_days($action) {
+      $u = new User();
+      $db = Loader::db();
+      
+      $result = $db->Execute('SELECT cv.cvName project_name, mpte.hours, DATE_FORMAT( mpte.spentOn, \'%d.%m.%Y\') spent_on, mpte.comment FROM  MeschProjectTimeEntries mpte 
+         INNER JOIN CollectionVersions cv ON mpte.projectID=cv.cID AND cv.cvIsApproved=1
+         LEFT JOIN CollectionVersions cv2 ON mpte.cID=cv2.cvID AND cv2.cvIsApproved=1
+         WHERE mpte.uID=? AND spentOn BETWEEN CURDATE() - INTERVAL 30 DAY AND CURDATE()
+         ORDER BY cv.cID, spentOn', array($u->getUserID()));
+
+      $reportOutput = '<h2>Time entries for last 30 days</h2>' . $this->buildTable($result);
+      
+      $this->set('reportOutput', $reportOutput);
+   }   
+   
    
 }
 ?>

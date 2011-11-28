@@ -27,7 +27,7 @@ class MeschProjectPackage extends Package {
 
 	protected $pkgHandle = 'mesch_project';
 	protected $appVersionRequired = '5.4';
-	protected $pkgVersion = '0.0.68';
+	protected $pkgVersion = '0.0.70';
 
 	public function getPackageDescription() {
 		return t("Installs the Mesch Project Management package.");
@@ -65,6 +65,10 @@ class MeschProjectPackage extends Package {
       if(!$issuePageType || !intval($issuePageType->getCollectionTypeID())){
          $issuePageType = CollectionType::add(array('ctHandle'=>'issue','ctName'=>t('Issue')),$pkg);
       }
+      $issuePageType = CollectionType::getByHandle('knowhow');
+      if(!$issuePageType || !intval($issuePageType->getCollectionTypeID())){
+         $issuePageType = CollectionType::add(array('ctHandle'=>'knowhow','ctName'=>t('Know How')),$pkg);
+      }      
       
 		$nat = AttributeType::getByHandle('number');
 		$dat = AttributeType::getByHandle('date_time');      
@@ -120,10 +124,15 @@ class MeschProjectPackage extends Package {
 
 		$sp4 = SinglePage::add('/invoice', $pkg);
 		$sp4->update(array('cName'=>t('Invoice'), 'cDescription'=>t('Invoice.'))); 
+      
+		$sp5 = SinglePage::add('/cronjob', $pkg);
+		$sp5->update(array('cName'=>t('Cronjob'), 'cDescription'=>t('Cronjob.'))); 
 	}
    
    public function upgrade() {		
    
+      $pkg = Package::getByHandle('mesch_project');
+      
 		Loader::model('collection_attributes');
       Loader::model('collection_types'); 
 		Loader::model('single_page');		
@@ -135,6 +144,8 @@ class MeschProjectPackage extends Package {
 		$sat = AttributeType::getByHandle('select');   
 		$uat = AttributeType::getByHandle('user_attribute'); 
 
+		$sp5 = SinglePage::add('/cronjob', $pkg);
+		$sp5->update(array('cName'=>t('Cronjob'), 'cDescription'=>t('Cronjob.'))); 
    }
 		
 	public function uninstall() {
@@ -142,7 +153,7 @@ class MeschProjectPackage extends Package {
    }
    
    public function on_start() {
-     	$html = Loader::helper('html');
+     	/*$html = Loader::helper('html');
       $uh = Loader::helper('concrete/urls');
       $v = View::getInstance();
       
@@ -168,7 +179,7 @@ class MeschProjectPackage extends Package {
             'dialog-height'   => "400",
             'class'           => 'dialog-launch'
          ), 'mesch_project');
-      }
+      }*/
    
    }
 

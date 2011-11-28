@@ -41,13 +41,16 @@ class MeschProjectCommentBlockController extends BlockController {
 	}
       
 	public function view() {
-		$th = Loader::helper('text');
+      $th = Loader::helper('text');
 		Loader::library('3rdparty/markdown');
 		Loader::library('geshi/geshi', 'mesch_project');
 		
 		$this->set('author',User::getByUserID($this->uID)->getUserName());
-		
-		if (defined('MESCH_PROJECT_FORMATTER_MAKENICE') && MESCH_PROJECT_FORMATTER_MAKENICE) {
+
+		/*
+      @TODO markdown before geshi doens't work, we use one fix configuration for now.
+      
+      if (defined('MESCH_PROJECT_FORMATTER_MAKENICE') && MESCH_PROJECT_FORMATTER_MAKENICE) {
 			$this->text = $th->makenice($this->text, 1);
 		}
 		
@@ -58,6 +61,7 @@ class MeschProjectCommentBlockController extends BlockController {
 		if (defined('MESCH_PROJECT_FORMATTER_AUTOLINK') && MESCH_PROJECT_FORMATTER_AUTOLINK) {
 			$this->text = $th->autolink($this->text, 1);
 		}		
+      
 		
 		if (defined('MESCH_PROJECT_FORMATTER_GESHI') && MESCH_PROJECT_FORMATTER_GESHI) {
 			$this->text = preg_replace_callback(
@@ -71,50 +75,73 @@ class MeschProjectCommentBlockController extends BlockController {
 					 return $geshi->parse_code();'
 				),
 				$this->text);		
-		}
-		
+		}*/
+
+      $this->text = $th->autolink($this->text, 1);
+      
+      $this->text = preg_replace_callback(
+         '/<code.*?>(.*?[<code.*?>.*<\/code>]*)<\/code>/ism',
+         create_function(
+            '$matches',
+            '$geshi = new GeSHi(trim($matches[1]), \'php\'); 
+             $geshi->set_overall_class(\'mesch-project-issue-comment-code\'); 
+             $geshi->set_link_target("_blank", "");
+             $geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS); 
+             return $geshi->parse_code();'
+         ),
+         $this->text);		         
+      
+      $this->text = preg_replace('/(?<!\n)\n(?![\n\*\#\-])/', "  \n", $this->text);
+      $this->text = Markdown($this->text);	      
+      
 		$this->set('text', $this->text);
 	
 	}
    
    protected function sendMailNotification($comment) {
-      if (ENABLE_EMAILS) {
-         $blocks = $this->c->getBlocks();
-         
-         $u = new User();
-         $uID = $u->getUserID();
-         
-         $recipients = array();
-         
-         foreach ($blocks as $block) {
-            if ($block->getBlockTypeHandle() == 'mesch_project_comment') {
-               $blockInstance = $block->getInstance();
-               
-               // ignore current user
-               if ($uID == $blockInstance->uID) continue;
-
-               $recipients[$blockInstance->uID] = $blockInstance->uID;
-            }
-         }
+      $blocks = $this->c->getBlocks();
       
-         $nh = Loader::helper('navigation');
-         
-         foreach ($recipients as $recipientID) {
-            $ui = UserInfo::getByID($recipientID);
+      $u = new User();
+      $uID = $u->getUserID();
+      
+      $recipients = array();
+      
+      // add current issue assignee to list of recipients
+      $c = Page::getCurrentPage();
+      $assigneeID = $c->getAttribute('mesch_project_assignee');
+      if ($uID != $assigneeID && $assigneeID != '') {
+         $recipients[$assigneeID] = $assigneeID;
+      }     
+      
+      // add all users who posted a comment
+      foreach ($blocks as $block) {
+         if ($block->getBlockTypeHandle() == 'mesch_project_comment') {
+            $blockInstance = $block->getInstance();
             
-            if (is_object($ui)) {
-               $mh = Loader::helper('mail');
-               $mh->addParameter('subject', $this->c->getCollectionName());
-               $mh->addParameter('text', $data['text']);
-               $mh->addParameter('recipient', $ui->getUserName());
-               $mh->addParameter('team', SITE);
-               $mh->addParameter('link', $nh->getLinkToCollection($this->c, true));
-               $mh->load('message_notification', 'mesch_project');
-               $mh->to($ui->getUserEmail());
-               $mh->sendMail();
-            }
+            // ignore current user
+            if ($uID == $blockInstance->uID) continue;
+
+            $recipients[$blockInstance->uID] = $blockInstance->uID;
          }
-      }
+      }      
+   
+      $nh = Loader::helper('navigation');
+      
+      foreach ($recipients as $recipientID) {
+         $ui = UserInfo::getByID($recipientID);
+         
+         if (is_object($ui)) {
+            $mh = Loader::helper('mail');
+            $mh->addParameter('subject', $this->c->getCollectionName());
+            $mh->addParameter('text', $comment);
+            $mh->addParameter('recipient', $ui->getUserName());
+            $mh->addParameter('team', SITE);
+            $mh->addParameter('link', $nh->getLinkToCollection($this->c, true));
+            $mh->load('message_notification', 'mesch_project');
+            $mh->to($ui->getUserEmail());
+            $mh->sendMail();
+         }
+      }      
    }
 	
 	public function save($args) {      

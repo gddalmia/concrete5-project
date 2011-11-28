@@ -66,11 +66,38 @@ h2 {
 }
 
 /* styles for issue page type */
-.mesch-project-issue, .mesch-project-issue-comment {
+/*.mesch-project-issue, .mesch-project-issue-comment {
    background-color: #FFFFF2;
    border: 1px solid #D8D8D8;
    padding: 5px;
    margin: 5px 0px 15px 0px;
+}*/
+.mesch-project-issue, .mesch-project-issue-comment {
+   padding: 5px;
+   margin: 5px 0px 15px 0px;
+   font-family: verdana, arial, helvetica, sans-serif;
+   font-size: 12px;
+   
+   background-color: #dce9f9;
+   background-image: -webkit-gradient(linear, left top, left bottom, from(#dce9f9), to(#ebf3fc));
+   background-image: -webkit-linear-gradient(top, #dce9f9, #ebf3fc);
+   background-image:    -moz-linear-gradient(top, #dce9f9, #ebf3fc);
+   background-image:     -ms-linear-gradient(top, #dce9f9, #ebf3fc);
+   background-image:      -o-linear-gradient(top, #dce9f9, #ebf3fc);
+   background-image:         linear-gradient(top, #dce9f9, #ebf3fc);
+
+   border: solid gray 1px;
+   -moz-border-radius: 6px;
+   -webkit-border-radius: 6px;
+   border-radius: 6px;
+   
+   -webkit-box-shadow: 4px 4px 15px #ccc; 
+   -moz-box-shadow: 4px 4px 15px #ccc; 
+   box-shadow: 4px 4px 15px #ccc;    
+}
+h1 a {
+   text-decoration: none;
+   color: black;
 }
 .mesch-project-issue-comment ul {
    margin: 10px 10px 10px 20px;
@@ -166,10 +193,11 @@ h2 {
    margin: 10px 0px 10px 0px;
 }
 .mesch-project-issue-comment pre {
-   overflow: scroll;
-   border: 1px solid #D8D8D8;
+   overflow: auto;
+   border: 1px solid #bbb;
    background: #F2F2F2;
    padding: 4px;
+   margin: 5px 0px 5px 0px;
 }
 .mesch-project-time-hour {
    width: 45px;
@@ -213,4 +241,13 @@ label {
 }
 .mesch-project-growl-error {
    background-color: red ! important;
+}
+.mesch-project-knowhow ul {
+   margin-left: 30px;
+}
+.mesch-project-knowhow h2, .mesch-project-knowhow h1 {
+   border-bottom: 1px solid silver;
+}
+.mesch-project-knowhow p {
+   margin: 10px 0px 5px 0px;
 }

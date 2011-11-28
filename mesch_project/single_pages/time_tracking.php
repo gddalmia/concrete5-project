@@ -27,7 +27,10 @@ $dtt = Loader::helper('form/date_time');
 
 function getSelectedDate() {
    var selectedDate = $('#mesch-project-time-date').datepicker('getDate');
-   return (selectedDate.getYear()+1900) + "-" + (selectedDate.getMonth()+1) + "-" + selectedDate.getDate();   
+   var selectedMonth = (selectedDate.getMonth()+1);
+   var selectedDay = selectedDate.getDate();
+   //return (selectedDate.getYear()+1900) + "-" + ((selectedMonth) < 10 ? '0':'')+ selectedMonth + "-" + ((selectedDay) < 10 ? '0':'')+ selectedDay;
+   return (selectedDate.getFullYear()) + "-" + ((selectedMonth) < 10 ? '0':'')+ selectedMonth + "-" + ((selectedDay) < 10 ? '0':'')+ selectedDay;
 }
 
 function loadEntries() {
