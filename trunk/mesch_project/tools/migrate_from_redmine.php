@@ -25,6 +25,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // READ THE CODE AND MAKE THE MODIFICATIONS YOU NEED
 // NOT A FINISHED PRODUCT!
 
+/*
+select cv.cvName,c.cID,
+(select sum(hours) from meschinfo_management.MeschProjectTimeEntries m where m.projectID=c.cID) time_mesch_management,
+round((select sum(hours) from meschinfo_migrate.time_entries te where te.project_id= (select a.value from CollectionAttributeValues cav inner join atNumber a on cav.avID=a.avID where cav.cID=c.cID and cav.cvID=cv.cvID and cav.akID=21 )),2)
+time_redmine
+ from Pages p 
+inner join Collections c on p.cID=c.cID
+inner join CollectionVersions cv on cv.cID=c.cID
+where ctID=2
+and c.cID!=80
+*/
+
 /**
  *
  * How does it work? You first have to copy some tables from
@@ -49,8 +61,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  * recommended to do this on a powerful computer not used by
  * other projects.
  */
- 
-ini_set('memory_limit', '1024M');
+                 
+ini_set('memory_limit', '128M');
 set_time_limit(60*60);
 
 $limitFrom = intval($_REQUEST['limitFrom']);
@@ -83,16 +95,20 @@ Loader::model('collection_types');
 Loader::model('page_list');     
 
 // clear data
-/*$db->Execute('DELETE FROM MeschProjectTimeEntries');
+/*
+$db->Execute('DELETE FROM MeschProjectTimeEntries');
 $childPages = $targetPage->getCollectionChildrenArray(1);
 foreach ($childPages as $childPageID) {
    $p = Page::getByID($childPageID);
    $p->delete();
-}*/
+   $i++;
+   
+}
+*/
             
 // import redmine data
 //$result = $db->Execute('SELECT * FROM projects  LIMIT ?,?', array($limitFrom, $limitCount));
-$result = $db->Execute('SELECT * FROM projects WHERE id=48');
+$result = $db->Execute('SELECT * FROM meschinfo_migrate.projects WHERE id between 341 and 400');
 while ($row = $result->FetchRow()) {
    $ctProject = CollectionType::getByHandle('project');
    $ctIssue = CollectionType::getByHandle('issue');
@@ -105,8 +121,10 @@ while ($row = $result->FetchRow()) {
   
    $newProjectPage = $targetPage->add($ctProject, $data);    
    
+   $newProjectPage->setAttribute('old_object_id', $row['id']);  
+   
    // migrate custom accessdata (not part of redmine)
-   $resultAccessdata = $db->Execute('select ad.* from access_data ad inner join customers c on ad.customer_ID=c.ID where redmineProjectID=?', array($row['id']));
+   $resultAccessdata = $db->Execute('select ad.* from meschinfo_migrate.access_data ad inner join meschinfo_migrate.customers_manager c on ad.customer_ID=c.ID where redmineProjectID=?', array($row['id']));
    while ($rowAccessdata = $resultAccessdata->FetchRow()) {
       $db->Execute('INSERT INTO MeschProjectAccessdata (cID, accessdataTypeId, name, userName, userPassword, serverName, databaseName) VALUES (?,?,?,?,?,?,?)',
          array(
@@ -123,11 +141,11 @@ while ($row = $result->FetchRow()) {
    
    // migrate redmine issues
    $resultIssues = $db->Execute('SELECT i.*, 
-      (select name from issue_statuses is_ where is_.id=i.status_id) status_name,
-      (select name from enumerations where type=\'IssuePriority\' and id=i.priority_id) priority_name,
-      (select uu.uID from users_redmine u inner join Users uu on  u.login=uu.uName where id=i.assigned_to_id) assigneeID,
-      (select uu.uID from users_redmine u inner join Users uu on  u.login=uu.uName where id=i.author_id) authorID
-      FROM issues i WHERE project_id=?', array($row['id']));
+      (select name from meschinfo_migrate.issue_statuses is_ where is_.id=i.status_id) status_name,
+      (select name from meschinfo_migrate.enumerations where type=\'IssuePriority\' and id=i.priority_id) priority_name,
+      (select uu.uID from meschinfo_migrate.users u inner join Users uu on  u.login=uu.uName where id=i.assigned_to_id) assigneeID,
+      (select uu.uID from meschinfo_migrate.users u inner join Users uu on  u.login=uu.uName where id=i.author_id) authorID
+      FROM meschinfo_migrate.issues i WHERE project_id=?', array($row['id']));
    while ($rowIssue = $resultIssues->FetchRow()) {
       $data = array();
       $data['cName']          = $rowIssue['subject'];
@@ -144,6 +162,8 @@ while ($row = $result->FetchRow()) {
       $newIssuePage->setAttribute('mesch_project_state', $statusMap[$rowIssue['status_name']]);
       $newIssuePage->setAttribute('mesch_project_priority', $priorityMap[$rowIssue['priority_name']]);
 
+      $newIssuePage->setAttribute('old_object_id', $rowIssue['id']);  
+
       $data = array();
       $data['text'] 		   = $rowIssue['description'];
       $data['createdOn'] 	= $rowIssue['created_on'];
@@ -153,8 +173,8 @@ while ($row = $result->FetchRow()) {
       
       // add issue comments
       $resultJournal = $db->Execute("select 
-      (select uu.uID from users_redmine u inner join Users uu on  u.login=uu.uName where u.id=j.user_id) assigneeID,
-      notes, created_on from journals j where journalized_type='Issue' and journalized_id=? and j.notes is not null order by id asc", array($rowIssue['id']));
+      (select uu.uID from meschinfo_migrate.users u inner join Users uu on  u.login=uu.uName where u.id=j.user_id) assigneeID,
+      notes, created_on from meschinfo_migrate.journals j where journalized_type='Issue' and journalized_id=? and j.notes is not null order by id asc", array($rowIssue['id']));
       
       while ($rowJournal = $resultJournal->FetchRow()) {
          $data = array();
@@ -168,7 +188,7 @@ while ($row = $result->FetchRow()) {
       
       // add time entries
       $resultTimeEntries = $db->Execute('SELECT round(te.hours,2) hours, te.comments, te.spent_on, te.created_on,
-         (select uu.uID from users_redmine u inner join Users uu on  u.login=uu.uName where u.id=te.user_id) userID FROM time_entries te WHERE te.project_id=? and te.issue_id=?', 
+         (select uu.uID from meschinfo_migrate.users u inner join Users uu on u.login=uu.uName where u.id=te.user_id) userID FROM meschinfo_migrate.time_entries te WHERE te.project_id=? and te.issue_id=?', 
          array($row['id'], $rowIssue['id']));
       while ($rowTimeEntries = $resultTimeEntries->FetchRow()) {
          $db->Execute('INSERT INTO MeschProjectTimeEntries (projectID, uID, cID, hours, spentOn, createdOn, comment) VALUES (?,?,?,?,?,?,?)',
@@ -189,7 +209,7 @@ while ($row = $result->FetchRow()) {
    
    // add time entries without issue connected to it
    $resultTimeEntries = $db->Execute('SELECT round(te.hours,2) hours, te.comments, te.spent_on, te.created_on,
-      (select uu.uID from users_redmine u inner join Users uu on  u.login=uu.uName where u.id=te.user_id) userID FROM time_entries te WHERE te.project_id=? and te.issue_id is null', 
+      (select uu.uID from meschinfo_migrate.users u inner join Users uu on  u.login=uu.uName where u.id=te.user_id) userID FROM meschinfo_migrate.time_entries te WHERE te.project_id=? and te.issue_id is null', 
       array($row['id']));
    while ($rowTimeEntries = $resultTimeEntries->FetchRow()) {
       $db->Execute('INSERT INTO MeschProjectTimeEntries (projectID, uID, cID, hours, spentOn, createdOn, comment) VALUES (?,?,?,?,?,?,?)',

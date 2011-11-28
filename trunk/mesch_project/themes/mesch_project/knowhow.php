@@ -22,19 +22,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 defined('C5_EXECUTE') or die(_("Access Denied."));
-
-if ($reportOutput) {
-   echo $reportOutput;
-}
-else {
-	$txt = Loader::helper('text');
-			
-   echo '<ul>';
-   foreach ($reports as $report) {
-      $reportName = str_replace('_',' ', $report);
-         
-      echo "<li><a href=\"" . $this->action($report,'query') . "\">$reportName</a></li>";
-   }
-   echo '</ul>';
-}
+$this->inc('elements/header.php');
 ?>
+
+<section id="content" class="mesch-project-knowhow">
+<?php
+$b = new Area('Content');
+$b->display($c);
+?>            
+</section>
+
+<?php $this->inc('elements/footer.php'); ?>

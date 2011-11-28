@@ -91,17 +91,7 @@ class IssuePageTypeController extends Controller {
       
       $txt = Loader::helper('text');
       
-      $fID = $this->importFile();
-      
-      if ($_POST['text'] != '' || $fID != '') {
-         $data = array();
-         $data['text'] 		   = $txt->sanitize($_POST['text']);	// @TODO check this, it seems to cause problems with markdown
-         $data['createdOn'] 	= date("Y-m-d H:i:s");
-         $data['uID'] 	      = $u->getUserID();	
-         $data['fID'] 	      = $fID;	
-                     
-         $block = $c->addBlock(BlockType::getByHandle('mesch_project_comment'),'Issue Comments',$data);	
-      }
+      $fID = $this->importFile();      
          
       // @TODO this code is executed after we already printed some attributes in the
       // head.. Refreshing the page is ugly as well, check this!
@@ -111,8 +101,18 @@ class IssuePageTypeController extends Controller {
          if (array_key_exists($collectionAttribute->akID,$_REQUEST['akID'])) {
             $collectionAttribute->setAttribute($c, $_REQUEST[$collectionAttribute->akID]);              
          }        
-      }         
-
+      }   
+      
+      if ($_POST['text'] != '' || $fID != '') {
+         $data = array();
+         $data['text'] 		   = $_POST['text']; // $txt->sanitize($_POST['text']);	// @TODO check this, sanitize also removes <code> among other necessary tags
+         $data['createdOn'] 	= date("Y-m-d H:i:s");
+         $data['uID'] 	      = $u->getUserID();	
+         $data['fID'] 	      = $fID;	
+                     
+         $block = $c->addBlock(BlockType::getByHandle('mesch_project_comment'),'Issue Comments',$data);	
+      }
+      
       $c->reindex();
                  
       $this->set('message', t('Issue updated'));      

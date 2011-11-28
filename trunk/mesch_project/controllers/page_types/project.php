@@ -118,6 +118,7 @@ class ProjectPageTypeController extends Controller {
       
       $ip = Loader::helper('validation/ip');
       $txt = Loader::helper('text');
+      $nh = Loader::helper('navigation');
 
 		if (!$ip->check()) {
 			$this->set('invalidIP', $ip->getErrorMessage());			
@@ -146,14 +147,32 @@ class ProjectPageTypeController extends Controller {
       $fID = $this->importFile();
       	  	
       // add block to new page to hold our issue description
-	  	$data['text'] 		   = $txt->sanitize($_POST['text']);	// @TODO check this, it seems to cause problems with markdown
+	  	$data['text'] 		   = $_POST['text']; // $txt->sanitize($_POST['text']);	// @TODO check this, it seems to cause problems with markdown
 	  	$data['createdOn'] 	= date("Y-m-d H:i:s");
 	  	$data['uID'] 	      = $u->getUserID();
 	  	$data['fID'] 	      = $fID;
            
 	  	$newPage->addBlock(BlockType::getByHandle('mesch_project_comment'),'Issue Description',$data);	
            
-      //
+      // send notification
+      $u = new User();
+      if ($u->getUserID() != $data['uID']) {
+         $ui = UserInfo::getByID($data['uID']);
+         
+         if (is_object($ui)) {
+            $mh = Loader::helper('mail');
+            $mh->addParameter('subject', $txt->sanitize($_POST['subject']));
+            $mh->addParameter('text', $data['text']);
+            $mh->addParameter('recipient', $ui->getUserName());
+            $mh->addParameter('team', SITE);
+            $mh->addParameter('link', $nh->getLinkToCollection($newPage, true));
+            $mh->load('new_issue_assigned', 'mesch_project');
+            $mh->to($ui->getUserEmail());
+            $mh->sendMail();
+         }
+      }
+      
+      // show project
       $this->view();    
    }
    

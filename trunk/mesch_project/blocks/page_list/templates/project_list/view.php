@@ -33,11 +33,12 @@
       if (count($childProjects) > 0) {
          echo '<ul>';
          foreach ($childProjects as $cSubProjectID) {
-            $subProject = Page::getByID($cSubProjectID);
+            $subProject = Page::getByID($cSubProjectID['cID']);
             echo "<li><a href=\"{$nh->getLinkToCollection($subProject)}\">{$subProject->getCollectionName()}</a></li>";
          }
          echo '</ul>';
       }
+      $childProjects = null;
       echo '</li>';
 	
    } 
