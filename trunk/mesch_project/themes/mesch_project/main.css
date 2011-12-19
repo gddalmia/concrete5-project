@@ -72,6 +72,9 @@ h2 {
    padding: 5px;
    margin: 5px 0px 15px 0px;
 }*/
+.mesch-project-issue p, .remo_board_message p {
+   margin: 5px 0px 5px 0px;
+}
 .mesch-project-issue, .mesch-project-issue-comment {
    padding: 5px;
    margin: 5px 0px 15px 0px;

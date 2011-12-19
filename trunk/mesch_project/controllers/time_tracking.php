@@ -55,7 +55,7 @@ class TimeTrackingController extends Controller {
       
       $this->addHeaderItem($hh->css('jquery.autocomplete.css', 'mesch_project'));
       $this->addHeaderItem($hh->css('jquery.jgrowl.css', 'mesch_project'));
-      $this->addHeaderItem($hh->javascript('jquery.autocomplete.min.js', 'mesch_project'));
+      $this->addHeaderItem($hh->javascript('jquery.autocomplete.js', 'mesch_project'));
       $this->addHeaderItem($hh->javascript('jquery.jgrowl_minimized.js', 'mesch_project'));
       $this->addHeaderItem($hh->javascript('jquery.dataselector.js', 'mesch_project'));
    }
@@ -74,6 +74,7 @@ class TimeTrackingController extends Controller {
       $issues = $issueList->get();
       $this->set('issues', $issues);
       
+      $issueArray['pID'] = $cID;
       $issueArray['entries'] = array();
       foreach ($issues as $issue) {
          $issueArray['entries'][] = array("cID" => $issue->getCollectionID(), "name" => $issue->getCollectionName());
@@ -128,18 +129,23 @@ class TimeTrackingController extends Controller {
             $ret['entries'][] = array('timeEntryID' => $db->Insert_ID());
          }
          else {
-            $db->Execute("UPDATE MeschProjectTimeEntries SET projectID=?, uID=?, cID=?, hours=?, spentOn=str_to_date(?,'%Y-%m-%d'), comment=? WHERE timeEntryID=?",
-               array(
-                  $entry['pID'],
-                  $u->getUserID(),
-                  $entry['cID'],
-                  $entry['hours'],
-                  $date,
-                  $entry['comment'],
-                  $entry['timeEntryID']
-               )); 
-                        
-            $ret['entries'][] = array('timeEntryID' => $entry['timeEntryID']);
+            if ($entry['hours'] == 0) {
+               $db->Execute('DELETE FROM MeschProjectTimeEntries WHERE timeEntryID=?', array($entry['timeEntryID']));
+            }
+            else {
+               $db->Execute("UPDATE MeschProjectTimeEntries SET projectID=?, uID=?, cID=?, hours=?, spentOn=str_to_date(?,'%Y-%m-%d'), comment=? WHERE timeEntryID=?",
+                  array(
+                     $entry['pID'],
+                     $u->getUserID(),
+                     $entry['cID'],
+                     $entry['hours'],
+                     $date,
+                     $entry['comment'],
+                     $entry['timeEntryID']
+                  )); 
+                           
+               $ret['entries'][] = array('timeEntryID' => $entry['timeEntryID']);
+            }
          }
       }
       $ret['sumHours'] = $db->GetOne("SELECT sum(hours) FROM MeschProjectTimeEntries WHERE spentOn=str_to_date(?,'%Y-%m-%d') AND uID=?", array($date, $u->getUserID()));

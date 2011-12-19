@@ -44,6 +44,7 @@ class ReportsController extends Controller {
       }
       $this->set('reports', $reportMethods);
    }
+
    
    public function show($reportID) {
       $db = Loader::db();
@@ -84,20 +85,48 @@ class ReportsController extends Controller {
       if ($headerAdded) {
          $ret .= "</tbody></table>";
       }
+      
+      if (array_key_exists('excel', $_GET)) {
+         header('Content-type: application/ms-excel');
+         header('Content-Disposition: attachment; filename=report.xls'); 
+         echo utf8_decode($ret);
+         die();              
+      }
       return $ret;
    }
-   
+      
+   public function report_current_month_for_current_user($action) {
+      $u = new User();
+      $db = Loader::db();      
+         
+      $result = $db->Execute('select cvName project_name,sum(hours) hours, substr(pp.cPath,2, locate(\'/\',pp.cPath,2)-2) company
+         from MeschProjectTimeEntries mpte 
+         inner join Collections c on mpte.projectID=c.cID
+         inner join CollectionVersions cv on c.cID=cv.cID and cv.cvIsApproved=1
+         inner join PagePaths pp on pp.cID=c.cID
+         where uID=? and year(spentOn)=year(now()) and month(spentOn)=month(now())
+         group by projectID,cvName, pp.cPath
+         order by pp.cPath, cvName', array($u->getUserID()));
+
+      $reportOutput = '<h2>Hours for current month</h2>' . $this->buildTable($result);
+      
+      $this->set('reportOutput', $reportOutput);
+   }
+
    public function report_last_month_for_current_user($action) {
       $u = new User();
       $db = Loader::db();
       
-      $result = $db->Execute('select cvName project_name,sum(hours) hours
+      $result = $db->Execute('select cvName project_name,sum(hours) hours, substr(pp.cPath,2, locate(\'/\',pp.cPath,2)-2) company
          from MeschProjectTimeEntries mpte 
          inner join Collections c on mpte.projectID=c.cID
          inner join CollectionVersions cv on c.cID=cv.cID and cv.cvIsApproved=1
-         where uID=? and year(spentOn)=year(now()) and month(spentOn)=month(now())
-         group by projectID,cvName
-         order by cvName', array($u->getUserID()));
+         inner join PagePaths pp on pp.cID=c.cID
+         where uID=? and spentOn BETWEEN 
+          ADDDATE(LAST_DAY(DATE_SUB(NOW(),INTERVAL 2 MONTH)), INTERVAL 1 DAY) 
+          AND DATE_SUB(LAST_DAY(NOW()),INTERVAL 1 MONTH)
+         group by projectID,cvName, pp.cPath
+         order by pp.cPath, cvName', array($u->getUserID()));
 
       $reportOutput = '<h2>Hours for last month</h2>' . $this->buildTable($result);
       
@@ -134,6 +163,18 @@ class ReportsController extends Controller {
 
       $this->set('reportOutput', $reportOutput);
    }   
+   
+   public function report_hours_with_missing_project_or_issue($action) {
+      $db = Loader::db();
+      
+      $result = $db->Execute('SELECT timeEntryID, projectID, mpte.cID, uID, hours, spentOn, comment FROM MeschProjectTimeEntries mpte 
+         WHERE NOT EXISTS (SELECT 1 from Collections c1 WHERE c1.cID=mpte.projectID)
+         OR (NOT EXISTS (SELECT 1 from Collections c1 WHERE c1.cID=mpte.cID) and mpte.cID > 0)');
+
+      $reportOutput = '<h2>Hours with missing project/issue connection</h2>' . $this->buildTable($result);
+
+      $this->set('reportOutput', $reportOutput);
+   }      
 
    public function report_time_entries_last_30_days($action) {
       $u = new User();

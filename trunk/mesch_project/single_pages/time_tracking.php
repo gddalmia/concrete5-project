@@ -49,6 +49,7 @@ function loadEntries() {
          
          $row.find(".mesch-project-time-project-list").data("cID", response.entries[timeEntryID].projectID);
          
+         //alert(response.entries[timeEntryID].cID + "  -  " + response.entries[timeEntryID].projectID) 
          $row.find(".mesch-project-time-issue-list").data("cID", response.entries[timeEntryID].cID);
          $row.find(".mesch-project-time-issue-list").data("pID", response.entries[timeEntryID].projectID);
          $row.find(".mesch-project-time-issue-list").data("toBeInitialized", 1);          
@@ -57,7 +58,6 @@ function loadEntries() {
          $row.find(".mesch-project-time-issue-list").val(response.entries[timeEntryID].issueName);
          $row.find(".mesch-project-time-hour").val(response.entries[timeEntryID].hours);
          $row.find(".mesch-project-time-comment").val(response.entries[timeEntryID].comment);
-         
       }
       
       initializeIssueLists();
@@ -74,6 +74,8 @@ function initializeIssueLists() {
       projectIssuesToLoad.push($(this).data("pID"));      
    });
    
+   $("#mesch-time-tracking-loading").show();
+   
    projectIssuesToLoad = jQuery.unique(projectIssuesToLoad);
    
    // get issues for each project once
@@ -81,8 +83,26 @@ function initializeIssueLists() {
       var pID = projectIssuesToLoad[key];
       
       $.post("<?php echo View::url('/time_tracking/getIssues/')?>" + pID, function(data) {
-         
-         $(".mesch-project-time-issue-list:data(toBeInitialized=1):data(pID="+pID+")").autocomplete(data.entries, {
+      
+         $(".mesch-project-time-issue-list:data(toBeInitialized=1):data(pID="+data.pID+")").each(function(e,v) {           
+            
+            $(this).unautocomplete().autocomplete(data.entries, {
+               autoFill: false,
+               minChars: 0,
+               max: 500,
+               formatItem: function(row, i, max) {
+                  return row.name;
+               },
+               formatMatch: function(row, i, max) {
+                  return row.name;
+               },
+               formatResult: function(row) {
+                  return row.name;
+               }   
+            });
+         });
+         /*
+         $(".mesch-project-time-issue-list:data(toBeInitialized=1):data(pID="+pID+")").unautocomplete().autocomplete(data.entries, {
             autoFill: false,
             minChars: 0,
             max: 500,
@@ -96,9 +116,13 @@ function initializeIssueLists() {
                return row.name;
             }   
          });
+         */
          
          $(".mesch-project-time-issue-list:data(toBeInitialized=1):data(pID="+pID+")").removeData("toBeInitialized");
                   
+         $("#mesch-time-tracking-loading").hide();
+
+                     
       }, "json"); 
    }
 }
@@ -159,13 +183,28 @@ $(document).ready(function() {
          $(this).find("input").css({"background": "white"});
 
          if (pID != void null || cID != void null || hours != "" || comment != "") {
-            if (pID == void null || cID == void null || hours == "") {
+            /*if (pID == void null || cID == void null || hours == "") {
                $(this).find("input").css({"background": "#FFAAAA"});
                hasMissingValues = true;
+            }*/
+
+            if (pID == void null) {
+               $(this).find(".mesch-project-time-project-list").css({"background": "#FFAAAA"});
+               hasMissingValues = true;
             }
+            if (cID == void null) {
+               $(this).find(".mesch-project-time-issue-list").css({"background": "#FFAAAA"});
+               hasMissingValues = true;
+            }
+            if (hours == "") {
+               $(this).find(".mesch-project-time-hour").css({"background": "#FFAAAA"});
+               hasMissingValues = true;
+            }
+
+            
          }         
           
-         if (pID != void null && cID != void null && hours != 0) {
+         if (pID != void null && cID != void null /*&& hours != 0*/) {
             entries.push({"timeEntryID": timeEntryID, "pID": pID, "cID": cID, "hours": hours, "comment": comment});
          }
       });
@@ -173,7 +212,8 @@ $(document).ready(function() {
       if (hasMissingValues) {
          $.jGrowl("<?php echo t('Time entries NOT saved due to missing values!') ?>");     
       }
-      else {         
+      else
+      {         
          //var data = {"date": $("#mesch-project-time-date").val(), "entries": entries};
          var data = {"date": getSelectedDate(), "entries": entries};
          var dataSaved = false;
@@ -242,6 +282,8 @@ $(document).ready(function() {
 </div>
 <div style="clear:both;"></div>
 
+<div id="mesch-time-tracking-loading" style="position:absolute;top: 16px; right: 16px;display:none;"><?php echo t('loading...')?></div>
+
 <form id="mesch-time-tracking-form">
 <div style="display:none;">
    <?php echo t('Date:')?> <input type="text" id="mesch-project-time-dateXXX" name="mesch-project-time-dateXXX"/>
@@ -278,3 +320,17 @@ $(document).ready(function() {
 </table>
 
 </form>
+
+
+
+<script type="text/javascript">
+function a() {
+   $(".mesch-project-time-issue-list:data(pID=11722)").each(function(e,v) {
+      alert($(this).data("cID"));
+   });
+   
+   $(".mesch-project-time-issue-list:data(pID=10709)").each(function(e,v) {
+      alert($(this).data("cID"));
+   });
+}
+</script>
