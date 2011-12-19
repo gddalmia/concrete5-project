@@ -1,0 +1,18 @@
+
+--This line, and those below, will be ignored--
+
+A    tools/new_issue.php
+M    themes/mesch_project/project.php
+M    controller.php
+A    elements
+A    elements/header_menu
+A    elements/header_menu/new_project
+A    elements/header_menu/new_project/view.css
+A    elements/header_menu/new_project/view.js
+AM   elements/header_menu/new_project/icon_header_files.png
+A    elements/header_menu/new_project/controller.php
+A    elements/header_menu/new_issue
+A    elements/header_menu/new_issue/view.css
+A    elements/header_menu/new_issue/view.js
+AM   elements/header_menu/new_issue/icon_header_files.png
+A    elements/header_menu/new_issue/controller.php

@@ -38,6 +38,9 @@ $(document).ready(function() {
 <?php
 if ($view == 'projectlist') {
 
+   echo '<a target="_blank" href="file://///srv01/Mesch/0000 Administration/0000 Korrespondenz/0000 Vorlagen Briefschaften/Rechnung mesch gmbh.ott">Vorlage</a><br/>';
+   echo '\\\\srv01\mesch\0000 Administration\0000 Korrespondenz\0000 Vorlagen Briefschaften\Rechnung mesch gmbh.ott';
+
 	echo '<table id="mesch-project-billing" class="mesch-project-table" style="width:auto ! important;">';
 	echo '<thead>
 		  <tr>

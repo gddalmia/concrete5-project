@@ -33,12 +33,12 @@ class InvoiceController extends Controller {
       
       $unbilledProjects = $db->GetAll('SELECT 
          projectID, 
-         sum(hours) hours, 
+         sum(if(invoiceID is null,hours,0)) hours, 
          cv.cvName,
          (SELECT COUNT(*) FROM MeschProjectInvoices m WHERE m.projectID=mpte.projectID) invoices
       FROM MeschProjectTimeEntries mpte INNER JOIN
       CollectionVersions cv ON mpte.projectID=cv.cID AND cv.cvIsApproved=1
-       WHERE invoiceID IS NULL GROUP BY projectID, cv.cvName
+       GROUP BY projectID, cv.cvName
        ORDER BY cv.cvName');
       $this->set('unbilledProjects', $unbilledProjects);
 	  $this->set('view', 'projectlist');

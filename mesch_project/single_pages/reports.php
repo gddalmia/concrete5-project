@@ -25,6 +25,8 @@ defined('C5_EXECUTE') or die(_("Access Denied."));
 
 if ($reportOutput) {
    echo $reportOutput;
+   
+   echo '<a href="?excel"><img src="' . DIR_REL . '/concrete/images/icons/excel.png"/></a>';
 }
 else {
 	$txt = Loader::helper('text');
