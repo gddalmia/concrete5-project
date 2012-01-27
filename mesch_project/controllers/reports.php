@@ -191,6 +191,39 @@ class ReportsController extends Controller {
       $this->set('reportOutput', $reportOutput);
    }   
    
+   public function report_all_hours_for_current_user($action) {
+      $u = new User();
+	  $uID = intval($u->getUserID());
+      $db = Loader::db();
+      
+		$result = $db->Execute('SELECT
+				substr(pp.cPath,2, locate(\'/\',pp.cPath,2)-2) 		company,
+				cv.cvName 											project_name, 
+				year(spentOn) 										year, 
+				month(spentOn) 										month,
+				sum(mpte.hours) 									hours
+			FROM Users u 
+			INNER JOIN 	MeschProjectTimeEntries mpte 	ON u.uID=mpte.uID
+			LEFT JOIN 	CollectionVersions cv 			ON mpte.projectID=cv.cID and cv.cvIsApproved=1
+			LEFT JOIN 	PagePaths pp 					ON cv.cID=pp.cID AND pp.ppIsCanonical=1
+			WHERE u.uID=?
+			GROUP BY 
+				u.uName, 
+				cv.cvName, 
+				year(spentOn), 
+				month(spentOn)
+			ORDER BY 
+				year(spentOn) desc, 
+				month(spentOn) desc, 
+				pp.cPath, 
+				u.uName desc, 
+				project_name', array($uID));
+
+      $reportOutput = '<h2>All Hours for current User</h2>' . $this->buildTable($result);
+      
+      $this->set('reportOutput', $reportOutput);
+   }   
+   
    
 }
 ?>

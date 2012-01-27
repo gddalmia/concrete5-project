@@ -125,12 +125,21 @@ class ProjectPageTypeController extends Controller {
 			return;
 		}      
       
+      $text = $_POST['text']; // $txt->sanitize($_POST['text']);	// @TODO check this, it seems to cause problems with markdown
+      $subject = $txt->sanitize($_POST['subject']);
+
+      if ($subject == '') {
+         $this->set('message',t('No subject entered, cannot create issue!'));
+         $this->view();
+         return;
+      }        
+      
       // create new child page for issue
 		$ct = CollectionType::getByHandle('issue');
 
 		$data = array();
-		$data['cName']          = $txt->sanitize($_POST['subject']);
-		$data['cDescription']   = $txt->sanitize($_POST['subject']);
+		$data['cName']          = $subject;
+		$data['cDescription']   = $subject;
 		$data['uID']            = $u->getUserID();
 	  
 	  	$newPage = $c->add($ct, $data); 	      
@@ -147,7 +156,7 @@ class ProjectPageTypeController extends Controller {
       $fID = $this->importFile();
       	  	
       // add block to new page to hold our issue description
-	  	$data['text'] 		   = $_POST['text']; // $txt->sanitize($_POST['text']);	// @TODO check this, it seems to cause problems with markdown
+	  	$data['text'] 		   = $text;
 	  	$data['createdOn'] 	= date("Y-m-d H:i:s");
 	  	$data['uID'] 	      = $u->getUserID();
 	  	$data['fID'] 	      = $fID;
@@ -161,11 +170,11 @@ class ProjectPageTypeController extends Controller {
          
          if (is_object($ui)) {
             $mh = Loader::helper('mail');
-            $mh->addParameter('subject', $txt->sanitize($_POST['subject']));
-            $mh->addParameter('text', $data['text']);
-            $mh->addParameter('recipient', $ui->getUserName());
-            $mh->addParameter('team', SITE);
-            $mh->addParameter('link', $nh->getLinkToCollection($newPage, true));
+            $mh->addParameter('subject',     $subject);
+            $mh->addParameter('text',        $data['text']);
+            $mh->addParameter('recipient',   $ui->getUserName());
+            $mh->addParameter('team',        SITE);
+            $mh->addParameter('link',        $nh->getLinkToCollection($newPage, true));
             $mh->load('new_issue_assigned', 'mesch_project');
             $mh->to($ui->getUserEmail());
             $mh->sendMail();
