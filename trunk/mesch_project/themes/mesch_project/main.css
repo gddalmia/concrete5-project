@@ -254,3 +254,25 @@ label {
 .mesch-project-knowhow p {
    margin: 10px 0px 5px 0px;
 }
+
+.mesch-project-action-message {
+   background-color: #dce9f9;
+   background-image: -webkit-gradient(linear, left top, left bottom, from(#ebf3fc), to(#DCEAAB));
+   background-image: -webkit-linear-gradient(top, #ebf3fc, #DCEAAB);
+   background-image:    -moz-linear-gradient(top, #ebf3fc, #DCEAAB);
+   background-image:     -ms-linear-gradient(top, #ebf3fc, #DCEAAB);
+   background-image:      -o-linear-gradient(top, #ebf3fc, #DCEAAB);
+   background-image:         linear-gradient(top, #ebf3fc, #DCEAAB);
+   -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.8) inset; 
+   -moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;  
+   box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;        
+   border: 1px solid #ccc;
+   padding: 4px 6px 4px 6px;
+   text-shadow: 0 1px 0 rgba(255,255,255,.5); 
+   -moz-border-radius: 6px;
+   -webkit-border-radius: 6px;
+   border-radius: 6px;   
+   font-size: 14px;
+   display: inline-block;
+   margin-bottom: 10px;
+}

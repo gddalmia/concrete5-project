@@ -47,6 +47,11 @@ $(document).ready(function() {
 
 <section id="content">
 <?php
+if (isset($message)) {
+   echo '<div class="mesch-project-action-message">';
+   echo $message;
+   echo '</div>';
+}
 
 echo '<h1>' . $c->getCollectionName() . '</h1>';
 

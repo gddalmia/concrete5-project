@@ -91,6 +91,8 @@ class IssuePageTypeController extends Controller {
       
       $txt = Loader::helper('text');
       
+      $text = $_POST['text']; // $txt->sanitize($_POST['text']);	// @TODO check this, sanitize also removes <code> among other necessary tags
+      
       $fID = $this->importFile();      
          
       // @TODO this code is executed after we already printed some attributes in the
@@ -105,7 +107,7 @@ class IssuePageTypeController extends Controller {
       
       if ($_POST['text'] != '' || $fID != '') {
          $data = array();
-         $data['text'] 		   = $_POST['text']; // $txt->sanitize($_POST['text']);	// @TODO check this, sanitize also removes <code> among other necessary tags
+         $data['text'] 		   = $text;
          $data['createdOn'] 	= date("Y-m-d H:i:s");
          $data['uID'] 	      = $u->getUserID();	
          $data['fID'] 	      = $fID;	

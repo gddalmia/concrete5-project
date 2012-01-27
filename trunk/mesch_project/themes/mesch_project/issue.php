@@ -32,7 +32,9 @@ $ath = Loader::helper('attribute_tool', 'mesch_project');
 <section id="content">
 <?php
 if (isset($message)) {
+   echo '<div class="mesch-project-action-message">';
    echo $message;
+   echo '</div>';
 }
 
 $parentProject = Page::getByID($c->getCollectionParentID());
